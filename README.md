@@ -27,6 +27,12 @@ Check out and contribute to this repo's Github Wiki
 * ~~The Fearless Knowledgebase on getOutline~~ (Self-hosting process in-progress)
 * The Fearless AWS Sandbox Account
 
+* Engineering Practice Domain Policy [Document](https://docs.google.com/document/d/1ScMFUJ32Su99KX6-B54vfcnchA5p-D33TY-gi1jnbr4/edit#heading=h.1zhtf6oxqwx7)
+* Engineering Developer Experience Values [Document](https://docs.google.com/document/d/17cnW0JOiGNk5knqWKnjzIfkB4GclgD51uWEjw-vJkPU/edit#heading=h.rq71lpfy5qdj)
+* Engineering Expectations and Guidelines [Document](https://docs.google.com/document/d/1KMfxRXptPV47lC-SJ4y1VSoEc9gbc0yVX0FLyakKsIg/edit#heading=h.qx2vp757r54y)
+
+  ***Feedback and comments are welcome for all shared documents***
+
 ## Desired Outcomes
 
 ### Documentation and Best Practices
@@ -54,4 +60,4 @@ We welcome contributions from all team members! Please review our CONTRIBUTING.m
 This Practice Domain is led by a team of Subject Matter Experts (SMEs), the Engineering Practice manager, and co-organizers, who can be contacted via our Slack channel or directly through GitHub. For more detailed information on our leadership structure and contact details, please refer to Contact Information.
 
 ## FAQ
-For more information about the Data Practice Domain, including how to get involved, how contributions impact your performance evaluations, and how this work aligns with our billable hours policy, please see our [Policy & FAQs](https://docs.google.com/document/d/1ScMFUJ32Su99KX6-B54vfcnchA5p-D33TY-gi1jnbr4/edit).
+For more information about the Data Practice Domain, including how to get involved, how contributions impact your performance evaluations, and how this work aligns with our billable hours policy, please see our [FAQs](https://docs.google.com/document/d/1ScMFUJ32Su99KX6-B54vfcnchA5p-D33TY-gi1jnbr4/edit#heading=h.1zhtf6oxqwx7).
