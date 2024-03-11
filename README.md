@@ -1,15 +1,15 @@
-# Data Practice Domain
+# Practice Domains
 
 ## Introduction
 
-Welcome to the Data Practice Domain at Fearless! This repository serves as a central hub for our collaborative efforts, showcasing best practices, facilitating knowledge sharing, and supporting continuous learning within the Data Domain. Our mission is to enhance our engineering capabilities, foster a vibrant community of practitioners, and ultimately, deliver superior solutions to our clients.
+Welcome to the Practice Domains at Fearless! This repository serves as a central hub for our collaborative efforts, showcasing best practices, facilitating knowledge sharing, and supporting continuous learning within the Practice Domain. Our mission is to enhance our engineering capabilities, foster a vibrant community of practitioners, and ultimately, deliver superior solutions to our clients.
 
 Check out and contribute to this repo's Github Wiki
 
 ## Our Goals
 
 * Collaboration: Foster an environment where team members can collaborate on projects, share insights, and contribute to open-source initiatives.
-* Education: Provide resources and guidelines to support ongoing learning and professional development within the Data Domain.
+* Education: Provide resources and guidelines to support ongoing learning and professional development within the Practice Domain.
 * Innovation: Encourage innovative approaches and solutions through shared examples, project templates, and best practices.
 * Excellence: Strive for excellence in our projects and practices, ensuring high-quality outcomes for our clients and stakeholders.
 
@@ -24,10 +24,10 @@ Check out and contribute to this repo's Github Wiki
 
 * An optional weekly 20-minute stand-up that the Practice Manager will lead
 * This mono-repo
-  * This GitHub [Wiki](https://github.com/FearlessSolutions/domain-data/wiki) 
+  * This GitHub [Wiki](./wiki)
   * This GitHub [Project Board](https://github.com/orgs/FearlessSolutions/projects/14) for Practice Domains
-  * This Github [Discussions](https://github.com/FearlessSolutions/domain-data/discussions)
-* The #domain-data Slack Channel
+  * This Github [Discussions](./discussions)
+* The #domain-<practice> Slack Channel
 * ~~The Fearless Knowledgebase on [getOutline](https://fearless.getoutline.com/home)~~ (Self-hosting process in-progress)
 * The Fearless AWS Sandbox Account
 
@@ -71,4 +71,4 @@ This Practice Domain is led by a team of Subject Matter Experts (SMEs), the Engi
 
 ## FAQ
 
-For more information about the Data Practice Domain, including how to get involved, how contributions impact your performance evaluations, and how this work aligns with our billable hours policy, please see our [FAQs](https://docs.google.com/document/d/1ScMFUJ32Su99KX6-B54vfcnchA5p-D33TY-gi1jnbr4/edit#heading=h.1zhtf6oxqwx7).
+For more information about the Practice Domains, including how to get involved, how contributions impact your performance evaluations, and how this work aligns with our billable hours policy, please see our [FAQs](https://docs.google.com/document/d/1ScMFUJ32Su99KX6-B54vfcnchA5p-D33TY-gi1jnbr4/edit#heading=h.1zhtf6oxqwx7).

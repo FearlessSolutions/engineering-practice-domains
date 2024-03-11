@@ -1,1 +1,1 @@
-# Data Practice Wiki
+# Practice Domain Wiki

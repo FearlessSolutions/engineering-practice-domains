@@ -1,6 +1,6 @@
-# Contributing to Data Practice Domain
+# Contributing to Practice Domains
 
-We're thrilled that you're interested in contributing to the Data Practice Domain! This document provides a set of guidelines for contributing to this practice domain's mono-repo on GitHub. These are mostly guidelines, not rules. Use your best judgment, and feel free to propose changes to this document in a pull request.
+We're thrilled that you're interested in contributing to the Practice Domains! This document provides a set of guidelines for contributing to this practice domain's mono-repo on GitHub. These are mostly guidelines, not rules. Use your best judgment, and feel free to propose changes to this document in a pull request.
 
 ## Our Practice Domain's Vision
 
@@ -10,7 +10,7 @@ Briefly explain the vision and key objectives of the practice domain. This helps
 
 ### Join the Conversation
 
-- **Slack Channel**: We recommend joining our Slack channel `#domain-data` to connect with other contributors and stay updated with discussions.
+- **Slack Channel**: We recommend joining our Slack channel `#domain-<practice>` to connect with other contributors and stay updated with discussions.
 - **Weekly Check-ins**: You're welcome to attend our weekly 15-minute check-ins. This is a great opportunity to ask questions, share ideas, and coordinate with others.
 
 ### Understand Our Workflow
@@ -58,4 +58,4 @@ Briefly explain the vision and key objectives of the practice domain. This helps
 
 - If you have any questions or need further clarification, please reach out to the Practice manager or post in the Slack channel.
 
-Thank you for contributing to the Data Practice Domain! Your efforts are helping to enhance our collective knowledge and capabilities.
+Thank you for contributing to the Practice Domains! Your efforts are helping to enhance our collective knowledge and capabilities.
