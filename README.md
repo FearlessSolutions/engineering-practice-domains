@@ -3,6 +3,8 @@
 ## Introduction
 Welcome to the Data Practice Domain at Fearless! This repository serves as a central hub for our collaborative efforts, showcasing best practices, facilitating knowledge sharing, and supporting continuous learning within the Data Domain. Our mission is to enhance our engineering capabilities, foster a vibrant community of practitioners, and ultimately, deliver superior solutions to our clients.
 
+Check out and contribute to this repo's Github Wiki
+
 ## Our Goals
 * Collaboration: Foster an environment where team members can collaborate on projects, share insights, and contribute to open-source initiatives.
 * Education: Provide resources and guidelines to support ongoing learning and professional development within the Data Domain.
@@ -16,6 +18,16 @@ Welcome to the Data Practice Domain at Fearless! This repository serves as a cen
 * Engage in Peer Learning: Participate in or organize workshops, hackathons, and training sessions.
 
 ## Resources
+* An optional weekly 20-minute stand-up that the Practice Manager will lead
+* This mono-repo
+  * This GitHub [Wiki](https://github.com/FearlessSolutions/domain-data/wiki) 
+  * This GitHub [Project Board](https://github.com/orgs/FearlessSolutions/projects/14) for Practice Domains
+  * This Github [Discussions](https://github.com/FearlessSolutions/domain-data/discussions)
+* The #domain-data Slack Channel
+* ~~The Fearless Knowledgebase on getOutline~~ (Self-hosting process in-progress)
+* The Fearless AWS Sandbox Account
+
+## Desired Outcomes
 
 ### Documentation and Best Practices
 * Getting Started Guides
