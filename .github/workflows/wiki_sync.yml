@@ -17,6 +17,9 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v2
+      - name: Generate Sidebar
+        run: |
+          npx markdown-file-tree
       - name: Sync docs to wiki
         uses: newrelic/wiki-sync-action@main
         with:
