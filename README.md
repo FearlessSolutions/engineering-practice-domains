@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Welcome to the Practice Domains at Fearless! This repository serves as a central hub for our collaborative efforts, showcasing best practices, facilitating knowledge sharing, and supporting continuous learning within the Practice Domain. Our mission is to enhance our engineering capabilities, foster a vibrant community of practitioners, and ultimately, deliver superior solutions to our clients.
+Welcome to the Practice Domains at Fearless! This repository serves as a central hub for our collaborative efforts, showcasing best practices, facilitating knowledge sharing, and supporting continuous learning within the Practice Domain. Our mission is to enhance our Practice capabilities, foster a vibrant community of practitioners, and ultimately, deliver superior solutions to our clients.
 
 Check out and contribute to this repo's Github Wiki
 
@@ -31,9 +31,9 @@ Check out and contribute to this repo's Github Wiki
 * ~~The Fearless Knowledgebase on [getOutline](https://fearless.getoutline.com/home)~~ (Self-hosting process in-progress)
 * The Fearless AWS Sandbox Account
 
-* Engineering Practice Domain Policy [Document](https://docs.google.com/document/d/1ScMFUJ32Su99KX6-B54vfcnchA5p-D33TY-gi1jnbr4/edit#heading=h.1zhtf6oxqwx7)
-* Engineering Developer Experience Values [Document](https://docs.google.com/document/d/17cnW0JOiGNk5knqWKnjzIfkB4GclgD51uWEjw-vJkPU/edit#heading=h.rq71lpfy5qdj)
-* Engineering Expectations and Guidelines [Document](https://docs.google.com/document/d/1KMfxRXptPV47lC-SJ4y1VSoEc9gbc0yVX0FLyakKsIg/edit#heading=h.qx2vp757r54y)
+* Fearless Practice Domain Policy [Document](https://docs.google.com/document/d/1ScMFUJ32Su99KX6-B54vfcnchA5p-D33TY-gi1jnbr4/edit#heading=h.1zhtf6oxqwx7)
+* Fearless Developer Experience Values [Document](https://docs.google.com/document/d/17cnW0JOiGNk5knqWKnjzIfkB4GclgD51uWEjw-vJkPU/edit#heading=h.rq71lpfy5qdj)
+* Fearless Expectations and Guidelines [Document](https://docs.google.com/document/d/1KMfxRXptPV47lC-SJ4y1VSoEc9gbc0yVX0FLyakKsIg/edit#heading=h.qx2vp757r54y)
 
   ***Feedback and comments are welcome for all shared documents***
 
@@ -67,7 +67,7 @@ We welcome contributions from all team members! Please review our CONTRIBUTING.m
 
 ## Leadership and Contact
 
-This Practice Domain is led by a team of Subject Matter Experts (SMEs), the Engineering Practice manager, and co-organizers, who can be contacted via our Slack channel or directly through GitHub. For more detailed information on our leadership structure and contact details, please refer to Contact Information.
+This Practice Domain is led by a team of Subject Matter Experts (SMEs), the Practice manager, and co-organizers, who can be contacted via our Slack channel or directly through GitHub. For more detailed information on our leadership structure and contact details, please refer to Contact Information.
 
 ## FAQ
 
