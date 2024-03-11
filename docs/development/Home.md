@@ -1,1 +1,0 @@
-# Development Practice Domain Wiki

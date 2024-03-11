@@ -1,1 +1,0 @@
-# Infrastructure Practice Domain Wiki
