@@ -1,0 +1,4 @@
+{
+    "source": "./docs",
+    "output": "./docs/_Sidebar.md"
+}
