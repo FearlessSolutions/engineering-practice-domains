@@ -4,7 +4,11 @@ We're thrilled that you're interested in contributing to the Practice Domains! T
 
 ## Our Practice Domain's Vision
 
-Briefly explain the vision and key objectives of the practice domain. This helps potential contributors understand the impact of their contributions.
+The goal is to create a place where you can bring back lessons learned from your projects, to repurpose open-source work that you've already done and invested your time in, and to share that with the rest of the herd. This is a place where you can find resources, examples, and best practices to help you get started on your next project.
+
+Try to think of what you'll need on your own project in the future and try to find people to collaborate on generalized solutions.
+
+Try to remember what tools or examples you wish you had when you started your current project.
 
 ## Getting Started
 
@@ -30,6 +34,7 @@ Briefly explain the vision and key objectives of the practice domain. This helps
 - Ideas suggestions are tracked as GitHub issues.
 - Use a clear and descriptive title for the issue to identify the idea or problem to solve.
 - Provide as much information as possible about the idea, project use-case, or active problem that you're trying to solve for.
+- Assign the relevant Milestone and Labels to the issue.
 
 ### Pull Requests
 
