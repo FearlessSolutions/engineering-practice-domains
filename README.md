@@ -20,6 +20,7 @@ Welcome to the Engineering Practice Domains at Fearless! This repository serves 
   * This Github [Discussions](https://github.com/FearlessSolutions/engineering-practice-domains/discussions)
 * On the Fearless Slack
  * The #domain-data Channel
+ * The #domain-infrastructure Channel
  * The #domain-platforms Channel
  * The #domain-testing Channel
  * The #domain-development Channel
