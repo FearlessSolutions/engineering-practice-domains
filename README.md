@@ -18,7 +18,11 @@ Welcome to the Engineering Practice Domains at Fearless! This repository serves 
   * This GitHub [Wiki](https://github.com/FearlessSolutions/engineering-practice-domains/wiki)
   * This GitHub [Project Board](https://github.com/orgs/FearlessSolutions/projects/14) for Practice Domains
   * This Github [Discussions](https://github.com/FearlessSolutions/engineering-practice-domains/discussions)
-* The #domain-<practice> Slack Channel
+* On the Fearless Slack
+ * The #domain-data Channel
+ * The #domain-platforms Channel
+ * The #domain-testing Channel
+ * The #domain-development Channel
 * ~~The Fearless Knowledgebase on [getOutline](https://fearless.getoutline.com/home)~~ (Self-hosting process in-progress)
 * The Fearless AWS Sandbox Account
 
