@@ -18,10 +18,14 @@ resource "aws_instance" "app_server" {
   ami           = "ami-1234567890abcdef0" # replace with a valid AMI for your region
   instance_type = "t3.xlarge"
 
-  key_name = "my-aws-keypair" # Ensure this key pair exists in your AWS account
+  # Go to AWS EC2 key-pair listing
+  key_name = "key-0dd9b3a1cbe164237" # Ensure this key pair exists in your AWS account
 
   # Security groups and networking
-  vpc_security_group_ids = ["sg-12345678"] # Replace with your security group ID
+
+  # Security group as defined below, use as is if you want to create a new security group every time
+  # Or replace with your preexisting security group ID
+  vpc_security_group_ids = aws_security_group.app_sg.id
   subnet_id              = "subnet-12345678" # Replace with your subnet ID
 
   user_data = <<-EOF
@@ -38,13 +42,32 @@ resource "aws_instance" "app_server" {
 }
 
 resource "aws_security_group" "app_sg" {
+  # Display name in console on AWS
   name        = "app-sg"
   
+  # use individual ingress blocks 
   ingress {
+    # Beginning bound of port range
     from_port   = 80
+    # end bound of port range
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["0.0.0.0/0"] # wildcard, lock down to a specific cidr range, anything that can get to it is allowed to.
+    # 
+  }
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] # wildcard, lock down to a specific cidr range, anything that can get to it is allowed to.
+  }
+  # hard code my home & work ip, or pull out of a parameter store
+  # Or add all IPS to a security group.
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] # wildcard, lock down to a specific cidr range, anything that can get to it is allowed to.
   }
 }
 
