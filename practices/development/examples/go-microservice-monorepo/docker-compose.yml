@@ -1,0 +1,44 @@
+version: "3.1"
+
+services:
+  db:
+    image: mariadb:11.0
+    command: --innodb-buffer-pool-size=2G
+    container_name: sample-microsvc-db
+    environment:
+      - MYSQL_ROOT_PASSWORD=mypass
+      - MYSQL_DATABASE=test
+      - MYSQL_USER=test
+      - MYSQL_PASSWORD=test
+    healthcheck:
+      test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
+      interval: 1m
+      timeout: 5s
+      retries: 3
+      start_period: 1m
+      start_interval: 10s
+    logging:
+      options:
+        max-size: '1m'
+    ports:
+      - '3306:3306'
+    restart: always
+    volumes:
+      - data:/var/lib/mysql
+  microsvc:
+    build:
+      context: ./
+      dockerfile: Microservice.dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true
+    env_file:
+      - .docker.example.env
+    logging:
+      options:
+        max-size: '1m'
+    ports:
+      - "80:80"
+volumes:
+  data:
