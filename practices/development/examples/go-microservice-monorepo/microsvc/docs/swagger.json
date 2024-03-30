@@ -1,0 +1,158 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This microservice template demonstrates how to write the code for a Go microservice.",
+        "title": "Microservice Template (Sample)",
+        "contact": {
+            "name": "API Support",
+            "url": "https://example.com/contact-us"
+        },
+        "version": "1.0"
+    },
+    "host": "127.0.0.1",
+    "basePath": "/",
+    "paths": {
+        "/api/v1/sample/greetings": {
+            "post": {
+                "description": "adds a greeting",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "greeting"
+                ],
+                "summary": "Add a greeting",
+                "parameters": [
+                    {
+                        "description": "'greeting' is the key to the value to be added into the database",
+                        "name": "greeting",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.NewGreetingRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Successfully created the greeting",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.emptyBody"
+                        }
+                    },
+                    "400": {
+                        "description": "The JSON payload was malformed",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.apiError"
+                        }
+                    },
+                    "409": {
+                        "description": "The greeting already exists",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.apiError"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/sample/greetings/greet": {
+            "post": {
+                "description": "you provide a name and you are greeted",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "greeting"
+                ],
+                "summary": "greeting",
+                "parameters": [
+                    {
+                        "description": "The name to address the greeting to",
+                        "name": "name",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.SampleGreetingRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/controller.SampleGreetingResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "The incoming JSON payload was malformed",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.apiError"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "controller.NewGreetingRequest": {
+            "type": "object",
+            "required": [
+                "greeting"
+            ],
+            "properties": {
+                "greeting": {
+                    "type": "string",
+                    "example": "Hello"
+                }
+            }
+        },
+        "controller.SampleGreetingRequest": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "example": "Xavier"
+                }
+            }
+        },
+        "controller.SampleGreetingResponse": {
+            "type": "object",
+            "required": [
+                "greeting"
+            ],
+            "properties": {
+                "greeting": {
+                    "type": "string",
+                    "example": "Hello Xavier"
+                }
+            }
+        },
+        "dtos.apiError": {
+            "type": "object",
+            "required": [
+                "description",
+                "detail"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "detail": {
+                    "type": "string"
+                }
+            }
+        },
+        "dtos.emptyBody": {
+            "type": "object"
+        }
+    }
+}

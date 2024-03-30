@@ -1,0 +1,105 @@
+basePath: /
+definitions:
+  controller.NewGreetingRequest:
+    properties:
+      greeting:
+        example: Hello
+        type: string
+    required:
+    - greeting
+    type: object
+  controller.SampleGreetingRequest:
+    properties:
+      name:
+        example: Xavier
+        type: string
+    required:
+    - name
+    type: object
+  controller.SampleGreetingResponse:
+    properties:
+      greeting:
+        example: Hello Xavier
+        type: string
+    required:
+    - greeting
+    type: object
+  dtos.apiError:
+    properties:
+      description:
+        type: string
+      detail:
+        type: string
+    required:
+    - description
+    - detail
+    type: object
+  dtos.emptyBody:
+    type: object
+host: 127.0.0.1
+info:
+  contact:
+    name: API Support
+    url: https://example.com/contact-us
+  description: This microservice template demonstrates how to write the code for a
+    Go microservice.
+  title: Microservice Template (Sample)
+  version: "1.0"
+paths:
+  /api/v1/sample/greetings:
+    post:
+      consumes:
+      - application/json
+      description: adds a greeting
+      parameters:
+      - description: '''greeting'' is the key to the value to be added into the database'
+        in: body
+        name: greeting
+        required: true
+        schema:
+          $ref: '#/definitions/controller.NewGreetingRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successfully created the greeting
+          schema:
+            $ref: '#/definitions/dtos.emptyBody'
+        "400":
+          description: The JSON payload was malformed
+          schema:
+            $ref: '#/definitions/dtos.apiError'
+        "409":
+          description: The greeting already exists
+          schema:
+            $ref: '#/definitions/dtos.apiError'
+      summary: Add a greeting
+      tags:
+      - greeting
+  /api/v1/sample/greetings/greet:
+    post:
+      consumes:
+      - application/json
+      description: you provide a name and you are greeted
+      parameters:
+      - description: The name to address the greeting to
+        in: body
+        name: name
+        required: true
+        schema:
+          $ref: '#/definitions/controller.SampleGreetingRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/controller.SampleGreetingResponse'
+        "400":
+          description: The incoming JSON payload was malformed
+          schema:
+            $ref: '#/definitions/dtos.apiError'
+      summary: greeting
+      tags:
+      - greeting
+swagger: "2.0"
