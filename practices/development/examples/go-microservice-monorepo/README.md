@@ -48,4 +48,4 @@ Ensure dbmate is installed locally by running `which dbmate`. If Dbmate is insta
 You can access the swagger documentation for the started microservice at [this location](http://localhost/api/swagger/index.html).
 
 ## Further reading
-Documentation topics can be found in the [doc](doc) folder. A glossary is provided at the root in [index.md](doc/index.md).
+Documentation topics can be found in the [doc](./doc) folder. A glossary is provided at the root in [README.md](./doc/README.md).
