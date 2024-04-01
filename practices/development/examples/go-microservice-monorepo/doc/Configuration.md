@@ -55,7 +55,7 @@ If those checks do not pass, construction of the registry fails with an error de
 
 Configuration options are created with the `config.NewOption()` function. It takes two parameters - the name of the configuration option
 in the environment and whether the option should be required or not. These options are defined in the **options** package if
-they're specific to a certain microservice or **sharedoptions** if the option is shared across multiple microservices. See [the repository layout docs](Navigation and Repository Layout.md)
+they're specific to a certain microservice or **sharedoptions** if the option is shared across multiple microservices. See [the repository layout docs](Navigation%20and%20Repository%20Layout.md)
 for information on where those are. These options can also be documented, so one can see what a configuration option is for when
 retrieved from a registry.
 
@@ -72,7 +72,7 @@ var TheAdditionalTopping = config.NewOption("ADDITIONAL_TOPPING", false)
 ### Creating a validated configuration option
 
 Configuration options can also use `jellydator/validation` validators to validate the content of configuration options. See
-the [validation documentation](Microservice Architecture.md#dtos-validation-and-responding) for more information on validation.
+the [validation documentation](Microservice%20Architecture.md#dtos-validation-and-responding) for more information on validation.
 These validations are run during the construction of the configuration registry to verify everything is in the correct format.
 Validations only run if the option is present, in the case of optional validation options.
 To create a validated configuration option, you can either construct it via the alternate constructor `config.NewValidatedOption()`
@@ -91,7 +91,7 @@ var ShortConfigOption = config.NewValidatedOption("SHORT_CONFIG_OPTION", false, 
 ### Creating a configuration registry and registering options
 
 Configuration options are registered with a configuration registry via a `config.RegistryBuilder` which should be defined in
-a microservice's **options** package. See the [repository layout docs](Navigation and Repository Layout.md) for where that is.
+a microservice's **options** package. See the [repository layout docs](Navigation%20and%20Repository%20Layout.md) for where that is.
 Once all the options are added, the `RegistryBuilder.VerifyAndBuild()` function is invoked which verifies the configuration in the
 environment and constructs the registry.
 

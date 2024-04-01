@@ -70,7 +70,7 @@ Entries can be added to the collection by using the HTTP verb `POST`. `PUT` may 
 (update if exists, otherwise insert) rather than an insertion into the collection. Requests made with these verbs
 contain the contents of the new entry in the request body.
 
-Fields in request bodies should be camel cased (via the go "json" struct tag, see [the microservice architecture docs](Microservice Architecture.md#dtos-validation-and-responding)
+Fields in request bodies should be camel cased (via the go "json" struct tag, see [the microservice architecture docs](Microservice%20Architecture.md#dtos-validation-and-responding)
 for more info) and acronyms should only capitalize the first letter.
 
 Examples:

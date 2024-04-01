@@ -153,7 +153,7 @@ func (CoreLogic) GroupSize(ctx context.Context, totalThings, numGroups int, calc
 ## Writing REST controllers (driving adapters)
 
 REST controllers are driving adapters that connect to the business logic's driving ports. They implement the `router.Controller`
-interface (see [repository layout](Navigation and Repository Layout.md) for where that package is) so they can be
+interface (see [repository layout](Navigation%20and%20Repository%20Layout.md) for where that package is) so they can be
 attached to a `router.Router` instance. They invoke business logic and convert DTO (Data Transfer Object) types to domain types defined in the
 business logic by the business logic's driven port definition.
 
@@ -399,7 +399,7 @@ func MyResponseFromDomain(stringSlice []string) MyCoolResponse {
 
 In order to make error responses consistent across the application and reduce the amount of boilerplate necessary, several
 error response functions are available to quickly respond with different HTTP status codes and report an error. These
-error response functions are available in the `response` package (see [repository layout](Navigation and Repository Layout.md)
+error response functions are available in the `response` package (see [repository layout](Navigation%20and%20Repository%20Layout.md)
 for where that is).
 
 The `response.APIErrorHelper` type returned from the canned response functions can be customized after its construction
@@ -485,7 +485,7 @@ wrapping any inserts triggered by driven ports will be automatically rolled back
 ### Attaching controllers to the router
 
 REST controllers implementing the `router.Controller` interface can be attached to the `router.Router` instance via the
-`router.Router.AttachControllers()` function. Each controller is instantiated in its own function in `bootstrap.go` (see [repo layout docs](Navigation and Repository Layout.md))
+`router.Router.AttachControllers()` function. Each controller is instantiated in its own function in `bootstrap.go` (see [repo layout docs](Navigation%20and%20Repository%20Layout.md))
 and added to the slice of controllers, which is passed along to the `AttachControllers()` function. Here's a small example,
 using the sample controller as seen in the previous examples:
 
@@ -545,7 +545,7 @@ func (DatabaseAdapter) GetSomeData(ctx context.Context) (int, error) {
 ```
 
 The database connection is attached to the context via the database context middleware, as described in [the middleware docs](Middleware.md#database-connection-middleware).
-You can see all the querying options available on the `database.Connection` type (see the [repo layout](Navigation and Repository Layout.md)
+You can see all the querying options available on the `database.Connection` type (see the [repo layout](Navigation%20and%20Repository%20Layout.md)
 for where the database package is).
 
 ### Database-specific DTOs
