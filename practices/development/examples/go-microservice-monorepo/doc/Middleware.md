@@ -20,7 +20,7 @@ The database connection middleware holds a `sqlx.DB` database connection and att
 This way, database-based driven ports can extract the database connection from the request context which is passed through
 every layer.
 
-See [this section in the microservice architecture docs](Microservice Architecture.md#acquiring-a-database-connection)
+See [this section in the microservice architecture docs](Microservice%20Architecture.md#acquiring-a-database-connection)
 for more information on accessing the database connection.
 
 ## Logging middleware

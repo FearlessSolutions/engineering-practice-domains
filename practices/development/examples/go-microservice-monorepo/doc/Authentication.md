@@ -10,7 +10,7 @@ request, but doesn't otherwise enforce use of credentials when hitting the API.
 The `auth` package provides a JWT extractor function to retrieve the claims parsed by the authentication middleware.
 This function is called `auth.RetrieveKeycloakClaims()`, and because the authentication token may not always be present,
 it returns a boolean in addition to the returned data structure stating whether the token is present or not. It is recommended
-that you respond with a 401 Unauthorized if you expect the token to be present. See the [microservice architecture docs](Microservice Architecture.md#writing-rest-controllers-driving-adapters)
+that you respond with a 401 Unauthorized if you expect the token to be present. See the [microservice architecture docs](Microservice%20Architecture.md#writing-rest-controllers-driving-adapters)
 for information on writing REST controllers.
 
 Here's an example of using `auth.RetrieveKeycloakClaims()`:

@@ -11,16 +11,16 @@ layout, making it easy to find different parts of the API/business logic/etc.
   * **auth** - Contains code for extracting authentication information from incoming requests, as well as data structures representing the contents of authentication information. For more info, see [Authentication.md](./Authentication.md).
   * **config** - Contains code for defining configuration options and retrieving them from a configuration registry. For more information see [Configuration.md](./Configuration.md)
     * **sharedoptions** - Contains common configuration options that may be used by all microservices
-  * **database** - Contains database-related code, including functions for managing transactions and extracting the database connection from the current request context. Relevant information can be found in [Middleware.md](./Middleware.md), [Microservice Architecture.md](./Microservice Architecture.md), and [Testing.md](./Testing.md).
+  * **database** - Contains database-related code, including functions for managing transactions and extracting the database connection from the current request context. Relevant information can be found in [Middleware.md](./Middleware.md), [Microservice Architecture.md](./Microservice%20Architecture.md), and [Testing.md](./Testing.md).
   * **logger** - Contains the global logger instance and functions for initializing it. For more information, see [Logging.md](./Logging.md).
-  * **request** - Contains utilities for extracting information from requests, such as deserializing the request body or pulling out the request context. For more information, see [Microservice Architecture.md](./Microservice Architecture.md).
+  * **request** - Contains utilities for extracting information from requests, such as deserializing the request body or pulling out the request context. For more information, see [Microservice Architecture.md](./Microservice%20Architecture.md).
     * **testhelper** - Contains utilities for building HTTP requests in test code. See [Testing.md](./Testing.md) for more information.
-  * **response** - Contains utilities for generating a standard error structure on HTTP responses. For more information, see [Microservice Architecture.md](./Microservice Architecture.md).
+  * **response** - Contains utilities for generating a standard error structure on HTTP responses. For more information, see [Microservice Architecture.md](./Microservice%20Architecture.md).
       * **dtos** - Contains code for common DTO types used in HTTP responses
       * **testhelper** - Contains utilities for deserializing HTTP response bodies into data structures in tests. See [Testing.md](./Testing.md) for more information.
   * **types** - Contains useful types for representing things in your code such as nullable values.
   * **sharedfeatures** - Contains common software features and controllers that can be used across microservices
-    * **FEATURE NAME** - The name of the folder describes the microservice feature implemented by the business logic in this directory. See [Microservice Architecture.md](./Microservice Architecture.md) for more information.
+    * **FEATURE NAME** - The name of the folder describes the microservice feature implemented by the business logic in this directory. See [Microservice Architecture.md](./Microservice%20Architecture.md) for more information.
       * **controller** - Contains REST controller definitions and DTOs which use and drive the business logic
       * **adapter** - Contains external access adapters used by the business logic to access or send data in external systems, such as message queues or databases.
 
@@ -35,6 +35,6 @@ to package-level stuff.
   * **bootstrap.go** - Functions invoked by main.go to stand up the subsystems of the application, such as initializing the logger and connecting to the database. It also has functions for creating the HTTP router and attaching routes from all REST controllers in the app.
   * **options** - Contains the global configuration registry and initialization functions for it. See [Configuration.md](./Configuration.md) for more information.
   * **features** - Contains implementations for features that the microservice exposes
-    * **FEATURE NAME** - The name of the folder describes the microservice feature implemented by the business logic in this directory. See [Microservice Architecture.md](./Microservice Architecture.md) for more information.
+    * **FEATURE NAME** - The name of the folder describes the microservice feature implemented by the business logic in this directory. See [Microservice Architecture.md](./Microservice%20Architecture.md) for more information.
       * **controller** - Contains REST controller definitions which use and drive the business logic
       * **adapter** - Contains external access adapters used by the business logic to access or send data in external systems, such as message queues or databases

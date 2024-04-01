@@ -45,13 +45,13 @@ configuration, the "production" state is determined by the `sharedoptions.IsInPr
 simple constructor parameter. 
 
 See ["Instantiating the logger"](#instantiating-the-logger) for more information on constructing the
-logger, and [the repository layout docs](Navigation and Repository Layout.md#layout-of-the-common-library) 
+logger, and [the repository layout docs](Navigation%20and%20Repository Layout.md#layout-of-the-common-library) 
 for more information on shared configuration options.
 
 ## Adjusting the log level
 
 Log level filters are controlled by both the shared option `sharedoptions.LogLevel` and the shared log level controller defined in the `loglevel` shared feature.
-See [the repository layout docs](Navigation and Repository Layout.md) for where to find those packages in the repo.
+See [the repository layout docs](Navigation%20and%20Repository Layout.md) for where to find those packages in the repo.
 
 The `loglevel` shared feature exposes HTTP endpoints for live-updating the application log level in production without an application restart.
 
