@@ -31,7 +31,7 @@ type SampleController struct {
 // ...SampleController constructor and AttachRoutes implementation
 
 func (ctrl SampleController) ExtractsTokenData(ctx echo.Context) error {
-	claims, claimsArePresent := auth.RetrieveKeycloakClaims(ctx)
+	claims, claimsArePresent := auth.RetrieveAuthClaims(ctx)
 	if !claimsArePresent {
 		return response.Unauthorized().Respond(ctx)
 	}
