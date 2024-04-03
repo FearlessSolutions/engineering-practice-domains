@@ -1,0 +1,72 @@
+version: 2.1
+
+orbs:
+  rust: circleci/rust@1.6
+
+commands:
+  rust_build:
+    parameters:
+      cache_bust_version:
+        type: string
+        default: v1
+    steps:
+      - restore_cache:
+          keys:
+            - debug-compile
+      - run:
+          name: Build code
+          command: cargo build
+      - save_cache:
+          key: debug-compile-{{ checksum "Cargo.lock" }}-<< parameters.cache_bust_version >>
+          paths:
+            - target/debug
+            - ~/.cargo
+
+jobs:
+  build-and-test:
+    docker:
+      - image: ghcr.io/emanguy/rust-ci:1.75-v1.1.0
+      - image: postgres:14-alpine
+        name: test-db
+        environment:
+          POSTGRES_PASSWORD: sample123
+    environment:
+      # This is needed for sqlx to verify queries
+      DATABASE_URL: "postgresql://postgres:sample123@test-db:5432"
+      # This is needed for the integration tests to actually connect to the database
+      TEST_DB_URL: "postgresql://postgres:sample123@test-db:5432"
+      DB_TABLE_URL: "postgresql://postgres:sample123@test-db:5432/postgres"
+    steps:
+      - checkout
+      - run:
+          name: Provision database
+          command: |
+            until psql -f postgres-scripts/postgres-setup.sql $DB_TABLE_URL  
+            do
+              echo "Trying again in a few seconds..."
+              sleep 5
+            done
+            echo "Migrations complete!"
+      - rust_build
+      - run:
+          name: "Run tests"
+          command: cargo test --features integration_test
+
+  validate-quality:
+    docker:
+      - image: ghcr.io/emanguy/rust-ci:1.75-v1.1.0
+    environment:
+      SQLX_OFFLINE: "true"
+    steps:
+      - checkout
+      - rust/clippy:
+          flags: --tests --features integration_test -- -D warnings
+      - run:
+          name: "Validate formatting"
+          command: cargo fmt --check
+
+workflows:
+  standard:
+    jobs:
+      - build-and-test
+      - validate-quality
