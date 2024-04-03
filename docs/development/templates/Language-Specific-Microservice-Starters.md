@@ -5,3 +5,4 @@ The development practice has a suite of language-specific templates for developi
 Here are the language templates that are currently available:
 
 * [Go](https://github.com/FearlessSolutions/engineering-practice-domains/tree/main/practices/development/examples/go-microservice-monorepo)
+* [Rust](https://github.com/FearlessSolutions/engineering-practice-domains/tree/main/practices/development/examples/rust-microservice-template)
