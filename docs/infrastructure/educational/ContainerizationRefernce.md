@@ -308,7 +308,7 @@ the size of the container image.
 - Exposes a port to be accessed internally by other containers within
   app.
 - Does not actually publish the port to the outside, or make a service
-  available outside Docker environment.
+  available outside Docker environment, it's merely a way of signaling intent.
 - Not strictly necessary since two containers on the same network within
   Docker Compose will be able to listen to any port regardless
 - Helps to be explicit, helps document intentions, helps some
@@ -452,12 +452,13 @@ the size of the container image.
   my docker compose up command
 - `container_name` - specify a custom container name, rather the default
   generated name <project_name>`_`<service_name>`_`<instance_number>
-
-#### others
-
 - `networks` - services communicate with each other through networks.
-  Establish an IP route between containers to connect services
+  - allowing containers to communicate with each other and the outside world in a controlled manner
+  - Containers on the same network can communicate with each other using
+    container names as hostnames.
+  - container names become DNS names, like localhost is a DNS name.
   - specify a `default` network
+  - Replaces legacy `--link` way of facilitating intra-container communication.
 - `volumes` - How services store and share persistent data. Could be
   high-level filesystem mount, bypasses union filesystem
   - If declared at top-level, volumes can be reused across multiple
