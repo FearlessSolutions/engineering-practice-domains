@@ -118,6 +118,13 @@ def perform_data_loading(records_to_write):
     }
 ```
 
+The `trace_function` decorator automatically adds the function name as a span attribute called `function_name`. This allows you to identify which specific function was executed when analyzing trace data. For example, in the code above, the span will include an attribute `function_name` with the value `"perform_data_loading"`.
+
+This attribute is particularly useful when:
+- Multiple functions are decorated with the same span name
+- You want to filter or group trace data by specific function implementations
+- You need to correlate performance issues with specific code functions
+
 ## Complete Example
 
 Here's a complete example of instrumenting an ETL pipeline:

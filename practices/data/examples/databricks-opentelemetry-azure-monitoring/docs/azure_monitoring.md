@@ -51,13 +51,14 @@ dependencies
 dependencies
 | where name == "DataExtraction"
 | extend etl_pipeline_id = tostring(customDimensions["etl_pipeline_id"]),
+         function_name = tostring(customDimensions["function_name"]),
          records_extracted = toint(customDimensions["records_extracted"]),
          http_status_code = tostring(customDimensions["http_status_code"]),
          http_response_size = toint(customDimensions["http_response_size"]),
          http_request_duration_sec = todouble(customDimensions["http_request_duration_sec"]),
          error = tostring(customDimensions["error"]),
          error_message = tostring(customDimensions["error_message"])
-| project timestamp, etl_pipeline_id, records_extracted, http_status_code, http_response_size, http_request_duration_sec, error, error_message
+| project timestamp, etl_pipeline_id, function_name, records_extracted, http_status_code, http_response_size, http_request_duration_sec, error, error_message
 | order by timestamp desc
 ```
 
@@ -67,6 +68,7 @@ dependencies
 dependencies
 | where name == "DataTransformation"
 | extend etl_pipeline_id = tostring(customDimensions["etl_pipeline_id"]),
+         function_name = tostring(customDimensions["function_name"]),
          records_input = toint(customDimensions["records_input"]),
          records_transformed = toint(customDimensions["records_transformed"]),
          records_failed = toint(customDimensions["records_failed"]),
@@ -76,7 +78,7 @@ dependencies
          processing_engine = tostring(customDimensions["processing_engine"]),
          error = tostring(customDimensions["error"]),
          error_message = tostring(customDimensions["error_message"])
-| project timestamp, etl_pipeline_id, records_input, records_transformed, records_failed, transformation_duration_sec, 
+| project timestamp, etl_pipeline_id, function_name, records_input, records_transformed, records_failed, transformation_duration_sec, 
           records_transformed_rate, transformation_type, processing_engine, error, error_message
 | order by timestamp desc
 ```
@@ -87,6 +89,7 @@ dependencies
 dependencies
 | where name == "DataLoading"
 | extend etl_pipeline_id = tostring(customDimensions["etl_pipeline_id"]),
+         function_name = tostring(customDimensions["function_name"]),
          records_written = toint(customDimensions["records_written"]),
          storage_path = tostring(customDimensions["storage_path"]),
          storage_type = tostring(customDimensions["storage_type"]),
@@ -99,7 +102,7 @@ dependencies
          storage_status = tostring(customDimensions["storage_status"]),
          error = tostring(customDimensions["error"]),
          error_message = tostring(customDimensions["error_msg"])
-| project timestamp, etl_pipeline_id, records_written, storage_path, storage_type, file_size_bytes, compression_type, 
+| project timestamp, etl_pipeline_id, function_name, records_written, storage_path, storage_type, file_size_bytes, compression_type, 
           partition_count, batch_size, write_duration_sec, records_write_rate, storage_status, error, error_message
 | order by timestamp desc
 ```
@@ -184,8 +187,9 @@ dependencies
 | where customDimensions.etl_pipeline_id == "your-etl-pipeline-id"
 | extend span_name = name,
          etl_pipeline_id = tostring(customDimensions["etl_pipeline_id"]),
+         function_name = tostring(customDimensions["function_name"]),
          duration_sec = todouble(customDimensions["duration_sec"])
-| project timestamp, span_name, duration_sec, operation_Id
+| project timestamp, span_name, function_name, duration_sec, operation_Id
 | order by timestamp asc
 ```
 

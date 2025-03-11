@@ -22,9 +22,9 @@ Each span captures specific information relevant to its stage of the ETL process
 | **Span**            | **Key Attributes**                                                                                    | **Description**                                            |
 |---------------------|-------------------------------------------------------------------------------------------------------|------------------------------------------------------------|
 | `ETL_Pipeline`      | `etl_pipeline_id`, `records_input_total`, `records_output_total`, `etl_total_duration_sec`, `etl_efficiency_rate`, `retry_attempts`, `etl_error_count` | Overall ETL execution metrics and performance              |
-| `DataExtraction`    | `records_extracted`, `http_status_code`, `http_response_size`, `http_request_duration_sec`             | API extraction performance and error details               |
-| `DataTransformation`| `records_input`, `records_transformed`, `records_failed`, `transformation_duration_sec`, `records_transformed_rate` | Data transformation performance and processing speed       |
-| `DataLoading`       | `records_written`, `write_duration_sec`, `storage_path`, `storage_status`                              | Data loading performance and error tracking                |
+| `DataExtraction`    | `function_name`, `records_extracted`, `http_status_code`, `http_response_size`, `http_request_duration_sec`             | API extraction performance and error details               |
+| `DataTransformation`| `function_name`, `records_input`, `records_transformed`, `records_failed`, `transformation_duration_sec`, `records_transformed_rate` | Data transformation performance and processing speed       |
+| `DataLoading`       | `function_name`, `records_written`, `write_duration_sec`, `storage_path`, `storage_status`                              | Data loading performance and error tracking                |
 
 ## Detailed Span Trace Attributes
 
@@ -63,6 +63,7 @@ Below are detailed tables that break down the trace attributes for each span in 
 | **Attribute Name**             | **Example Value**                          | **Description** |
 |--------------------------------|--------------------------------------------|-----------------|
 | `etl_pipeline_id`              | `"etl_run_1234"`                           | Unique identifier for the ETL run. |
+| `function_name`                | `"extract_data_from_api"`                  | Name of the function that was decorated with the trace_function decorator. |
 | `http_request_duration_sec`    | `1.234`                                    | Duration of the API request in seconds. |
 | `records_extracted`            | `10000`                                    | Number of records fetched from the API. |
 | `http_response_size`           | `500000`                                   | Simulated size of the API response in bytes. |
@@ -77,6 +78,7 @@ Below are detailed tables that break down the trace attributes for each span in 
 | **Attribute Name**             | **Example Value**                          | **Description** |
 |--------------------------------|--------------------------------------------|-----------------|
 | `etl_pipeline_id`              | `"etl_run_1234"`                           | Unique identifier for the ETL run. |
+| `function_name`                | `"transform_data"`                         | Name of the function that was decorated with the trace_function decorator. |
 | `error`                        | `"false"`                                  | Indicates if an error occurred during transformation. |
 | `records_input`                | `10000`                                    | Number of records received for transformation. |
 | `records_transformed`          | `9800`                                     | Number of records successfully transformed. |
@@ -93,6 +95,7 @@ Below are detailed tables that break down the trace attributes for each span in 
 | **Attribute Name**          | **Example Value**                | **Description** |
 |-----------------------------|----------------------------------|-----------------|
 | `etl_pipeline_id`           | `"etl_run_1234"`                 | Unique identifier for the ETL run. |
+| `function_name`             | `"perform_data_loading"`         | Name of the function that was decorated with the trace_function decorator. |
 | `error`                     | `"false"`                        | Indicates if the write process failed. |
 | `error_msg`                 | `""`                             | Error details if loading failed. |
 | `records_written`           | `9800`                           | Number of records successfully written to storage. |
@@ -162,6 +165,8 @@ To add tracing to your own ETL pipelines, follow these steps:
        return {
            "result_key": "value"
        }
+   
+   # Note: The function_name attribute ("your_function") is automatically added to the span
    ```
 
 4. **Add events for significant occurrences**:
