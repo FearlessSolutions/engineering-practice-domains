@@ -1,0 +1,175 @@
+# Metrics Guide
+
+This guide provides detailed information about the OpenTelemetry metrics instrumentation used in this project, including metric types, values, and how to use them for monitoring your ETL pipelines.
+
+## Metrics Instrumentation Overview
+
+In addition to tracing, the ETL simulation is instrumented with OpenTelemetry metrics to provide real-time performance insights. These custom metric instruments are exported to Azure Monitor Application Insights, allowing you to:
+
+- Track API request durations and success rates
+- Monitor transformation processing times and error counts
+- Analyze data loading performance, including throughput and write durations
+- Assess overall ETL efficiency and detect performance bottlenecks
+
+## Metric Types
+
+OpenTelemetry supports different types of metrics, each suited for specific use cases:
+
+1. **Counters**: Used for values that only increase, such as the number of records processed or errors encountered.
+2. **Histograms**: Used for measuring the distribution of values, such as request durations or processing times.
+
+In the ETL simulation, both types are used to provide comprehensive monitoring.
+
+## Metrics Configuration
+
+Metrics are configured during the initialization of the OpenTelemetryHelper:
+
+```python
+etl_otel_helper = OpenTelemetryHelper(
+    span_name="ETL_Pipeline",
+    etl_pipeline_id=etl_pipeline_id,
+    span_metrics={
+        "DataExtraction": {"records_extracted": "counter", "http_request_duration_sec": "histogram"},
+        "DataTransformation": {"records_transformed": "counter", "transformation_duration_sec": "histogram"},
+        "DataLoading": {"records_written": "counter", "write_duration_sec": "histogram"},
+    },
+    span_attributes={"data_source": "External API", "etl_type": "Full Load"}
+)
+```
+
+This configuration creates the following metrics:
+- For `DataExtraction`: a counter for `records_extracted` and a histogram for `http_request_duration_sec`
+- For `DataTransformation`: a counter for `records_transformed` and a histogram for `transformation_duration_sec`
+- For `DataLoading`: a counter for `records_written` and a histogram for `write_duration_sec`
+
+## Metrics Table
+
+The following table provides details on all metrics used in the ETL simulation:
+
+| **Metric Name**                     | **Type**   | **Stage**           | **Description**                                                                 |
+|-------------------------------------|------------|---------------------|---------------------------------------------------------------------------------|
+| `records_extracted`                 | Counter    | Data Extraction     | Number of records extracted from the API.                                       |
+| `http_request_duration_sec`         | Histogram  | Data Extraction     | Duration (in seconds) of the HTTP request during data extraction.               |
+| `records_transformed`               | Counter    | Data Transformation | Number of records successfully transformed.                                     |
+| `records_failed_transformation`     | Counter    | Data Transformation | Number of records that failed during transformation.                            |
+| `transformation_duration_sec`       | Histogram  | Data Transformation | Time taken (in seconds) to transform the data.                                  |
+| `records_written`                   | Counter    | Data Loading        | Number of records successfully written to storage.                              |
+| `write_duration_sec`                | Histogram  | Data Loading        | Duration (in seconds) of the data loading process.                              |
+| `etl_total_duration_sec`            | Histogram  | Pipeline            | Total duration of the ETL pipeline execution.                                   |
+| `etl_efficiency_rate`               | Histogram  | Pipeline            | ETL efficiency percentage, calculated as `(records_written / records_extracted) * 100`. |
+| `retry_attempts`                    | Counter    | Pipeline            | Number of retry attempts made during the ETL process.                           |
+| `etl_error_count`                   | Counter    | Pipeline            | Total count of errors encountered during the ETL execution.                     |
+
+## Recording Metrics
+
+Metrics are recorded during the execution of the ETL pipeline using the `record_metric` method:
+
+```python
+etl_otel_helper.record_metric("DataExtraction", "records_extracted", records_extracted)
+etl_otel_helper.record_metric("DataExtraction", "http_request_duration_sec", duration_sec)
+```
+
+For metrics associated with functions decorated with `trace_function`, the metrics are automatically recorded if the function returns a dictionary with keys matching the metric names:
+
+```python
+@etl_otel_helper.trace_function("DataLoading", {
+    "etl_pipeline_id": "etl_pipeline_id",
+    "records_written": "records_written",
+    "write_duration_sec": "write_duration_sec",
+    # other attributes...
+})
+def perform_data_loading(records_to_write):
+    # Function implementation
+    return {
+        "records_written": records_written,
+        "write_duration_sec": write_duration_sec,
+        # other return values...
+    }
+```
+
+## Metric Attributes
+
+Metrics can include attributes to provide additional context. By default, the `etl_pipeline_id` is included as an attribute for all metrics, allowing you to correlate metrics with specific ETL runs:
+
+```python
+metric_attrs = {"etl_pipeline_id": self.etl_pipeline_id}
+```
+
+You can also provide custom attributes when recording metrics:
+
+```python
+etl_otel_helper.record_metric("DataExtraction", "records_extracted", records_extracted, {
+    "source": "API",
+    "batch_id": batch_id
+})
+```
+
+## Implementing Metrics in Your Code
+
+To add metrics to your own ETL pipelines, follow these steps:
+
+1. **Define metrics during initialization**:
+   ```python
+   etl_otel_helper = OpenTelemetryHelper(
+       span_name="ETL_Pipeline",
+       etl_pipeline_id=etl_pipeline_id,
+       span_metrics={
+           "YourStage": {"your_counter": "counter", "your_histogram": "histogram"},
+       }
+   )
+   ```
+
+2. **Record metric values during execution**:
+   ```python
+   # Record a counter
+   etl_otel_helper.record_metric("YourStage", "your_counter", value)
+   
+   # Record a histogram
+   etl_otel_helper.record_metric("YourStage", "your_histogram", duration)
+   ```
+
+3. **Use the function decorator for automatic metric recording**:
+   ```python
+   @etl_otel_helper.trace_function("YourStage", {
+       "your_counter": "result_counter",
+       "your_histogram": "result_duration"
+   })
+   def your_function():
+       # Function implementation
+       return {
+           "result_counter": value,
+           "result_duration": duration
+       }
+   ```
+
+## Best Practices for Metrics
+
+1. **Choose appropriate metric types** based on what you're measuring:
+   - Use counters for cumulative values (records processed, errors)
+   - Use histograms for distributions (durations, sizes)
+
+2. **Include meaningful attributes** to provide context and enable filtering.
+
+3. **Use consistent naming conventions** for metrics across your application.
+
+4. **Focus on actionable metrics** that provide insights into performance and reliability.
+
+5. **Consider cardinality** when adding attributes to avoid excessive metric combinations.
+
+6. **Correlate metrics with traces** using the `etl_pipeline_id` to enable comprehensive analysis.
+
+## Viewing Metrics in Azure Monitor
+
+Once exported to Azure Monitor, metrics can be:
+
+- Visualized in dashboards
+- Used for alerting
+- Analyzed for trends and anomalies
+
+See the [Azure Monitoring Guide](azure_monitoring.md) for detailed instructions on working with metrics in Azure Monitor.
+
+## Next Steps
+
+- Review the [Tracing Guide](tracing.md) for details on the trace attributes and components
+- See the [Azure Monitoring Guide](azure_monitoring.md) for instructions on querying and visualizing the metric data
+- Explore the [ETL Simulation Guide](etl_simulation.md) for a complete example of metrics implementation
