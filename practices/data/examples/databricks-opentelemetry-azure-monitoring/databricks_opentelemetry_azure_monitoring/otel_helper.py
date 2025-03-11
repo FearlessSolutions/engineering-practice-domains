@@ -209,6 +209,8 @@ class OpenTelemetryHelper:
             def wrapper(*args, **kwargs):
                 # Start the span
                 self.start_tracing(span_name, {"etl_pipeline_id": self.etl_pipeline_id})
+                # Add function name as a span attribute
+                self.set_span_attribute(span_name, "function_name", func.__name__)
                 print(f"Started tracing for function '{func.__name__}' with span '{span_name}'")
                 
                 try:
