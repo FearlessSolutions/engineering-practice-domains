@@ -2,11 +2,11 @@
 # MAGIC %md
 # MAGIC # ETL Pipeline Simulation WITH OpenTelemetry 
 # MAGIC
-# MAGIC This notebook simulates an ETL pipeline. It will be later used to demonstrate both trace and metric instrumentation using OpenTelemetry and Azure Monitor.
+# MAGIC This notebook demonstrates an ETL pipeline that has been instrumented with OpenTelemetry to provide comprehensive tracing and metrics. It shows how to implement observability in a Databricks ETL workflow using the OpenTelemetry framework integrated with Azure Monitor.
 # MAGIC
-# MAGIC The instrumentation will be added to this notebook in a way that is modular and has the least code changes to the original notebook cells.
+# MAGIC The instrumentation has been added in a modular way with minimal changes to the original ETL code, demonstrating how to add observability without significantly refactoring existing pipelines.
 # MAGIC
-# MAGIC OpenTelemetry Parent Notebook/Span name:  ETL_Pipeline
+# MAGIC OpenTelemetry Parent Notebook/Span name: ETL_Pipeline
 # MAGIC
 
 # COMMAND ----------
