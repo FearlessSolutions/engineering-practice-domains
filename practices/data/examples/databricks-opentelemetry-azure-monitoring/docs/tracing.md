@@ -191,8 +191,150 @@ To add tracing to your own ETL pipelines, follow these steps:
 6. **Add events** to mark significant occurrences during execution.
 7. **Keep span hierarchy consistent** with your application's logical structure.
 
+## Parent-Child Notebook Tracing
+
+The parent-child notebook example demonstrates how to use OpenTelemetry tracing to monitor the execution of notebook workflows. This approach allows you to track the execution of child notebooks without requiring OpenTelemetry instrumentation in each notebook.
+
+### Span Structure for Parent-Child Notebooks
+
+The parent-child notebook example creates the following span hierarchy:
+
+- **Notebook_Workflow** (Parent Span)
+  - **Child_Notebook_1** (Child Span)
+  - **Child_Notebook_2** (Child Span)
+
+Each span captures specific information relevant to its part of the workflow, providing a comprehensive view of the execution.
+
+### Detailed Span Trace Attributes for Parent-Child Notebooks
+
+Below are detailed tables that break down the trace attributes for each span in the parent-child notebook example.
+
+#### `Notebook_Workflow` (Parent Span)
+
+| **Attribute Name**          | **Example Value**                           | **Description** |
+|-----------------------------|---------------------------------------------|-----------------|
+| `etl_pipeline_id`           | `"workflow_1234"`                           | Unique identifier for the notebook workflow. |
+| `workflow_type`             | `"Data Processing Pipeline"`                | Type of workflow being executed. |
+| `environment`               | `"Development"`                             | Environment where the workflow is running. |
+| `total_records_processed`   | `8500`                                      | Total number of records processed in the workflow. |
+| `total_errors`              | `25`                                        | Total number of errors encountered during the workflow. |
+| `workflow_success`          | `"true"`                                    | Indicates if the workflow completed successfully. |
+| `validation_status`         | `"Success"`                                 | Status of the data validation process. |
+| `aggregation_status_code`   | `200`                                       | Status code from the data aggregation process. |
+| `validation_time_sec`       | `3.45`                                      | Duration of the data validation process in seconds. |
+| `aggregation_time_sec`      | `5.67`                                      | Duration of the data aggregation process in seconds. |
+| `duration_sec`              | `10.23`                                     | Total duration of the workflow in seconds. |
+
+#### `Child_Notebook_1` (Data Validation Span)
+
+| **Attribute Name**          | **Example Value**                           | **Description** |
+|-----------------------------|---------------------------------------------|-----------------|
+| `etl_pipeline_id`           | `"workflow_1234"`                           | Unique identifier for the notebook workflow. |
+| `notebook_path`             | `"child_notebook_1"`                        | Path to the child notebook. |
+| `task`                      | `"data_validation"`                         | Task performed by the child notebook. |
+| `status`                    | `"Success"`                                 | Status of the child notebook execution. |
+| `total_records`             | `8500`                                      | Number of records processed in the child notebook. |
+| `validation_errors`         | `25`                                        | Number of validation errors found. |
+| `processing_time_sec`       | `3.45`                                      | Duration of the child notebook execution in seconds. |
+| `records_per_second`        | `2463.77`                                   | Processing rate in records per second. |
+| `error`                     | `"false"`                                   | Indicates if an error occurred during execution. |
+| `error_message`             | `""`                                        | Error message if an error occurred. |
+| `duration_sec`              | `3.45`                                      | Total duration of the child notebook span. |
+
+#### `Child_Notebook_2` (Data Aggregation Span)
+
+| **Attribute Name**          | **Example Value**                           | **Description** |
+|-----------------------------|---------------------------------------------|-----------------|
+| `etl_pipeline_id`           | `"workflow_1234"`                           | Unique identifier for the notebook workflow. |
+| `notebook_path`             | `"child_notebook_2"`                        | Path to the child notebook. |
+| `task`                      | `"data_aggregation"`                        | Task performed by the child notebook. |
+| `status_code`               | `200`                                       | Status code of the child notebook execution. |
+| `num_aggregations`          | `35`                                        | Number of aggregation operations performed. |
+| `execution_time_sec`        | `5.67`                                      | Duration of the child notebook execution in seconds. |
+| `memory_usage_mb`           | `350.5`                                     | Memory usage during execution in MB. |
+| `aggregations_breakdown`    | `{"sum": 10, "average": 8, "count": 17}`    | Breakdown of aggregation operations by type. |
+| `error`                     | `"false"`                                   | Indicates if an error occurred during execution. |
+| `error_message`             | `""`                                        | Error message if an error occurred. |
+| `duration_sec`              | `5.67`                                      | Total duration of the child notebook span. |
+
+### Span Events in Parent-Child Notebooks
+
+The parent-child notebook example demonstrates the use of span events to mark significant points in the workflow:
+
+#### Child Notebook Execution Started
+
+```python
+workflow_otel_helper.add_span_event("Child_Notebook_1", "Child Notebook Execution Started", {
+    "notebook_path": "child_notebook_1",
+    "timestamp": time.time()
+})
+```
+
+This event marks the start of a child notebook execution and includes the notebook path and timestamp.
+
+#### Child Notebook Execution Completed
+
+```python
+workflow_otel_helper.add_span_event("Child_Notebook_1", "Child Notebook Execution Completed", {
+    "status": child1_result["status"],
+    "total_records": child1_result["total_records"],
+    "validation_errors": child1_result["validation_errors"],
+    "timestamp": time.time()
+})
+```
+
+This event marks the completion of a child notebook execution and includes key results from the child notebook.
+
+#### Workflow Completed
+
+```python
+workflow_otel_helper.add_span_event("Notebook_Workflow", "Workflow Completed", {
+    "workflow_success": str(workflow_success),
+    "total_records_processed": total_records_processed,
+    "total_errors": total_errors,
+    "total_execution_time_sec": round(total_execution_time, 2),
+    "timestamp": time.time()
+})
+```
+
+This event marks the completion of the entire workflow and includes summary information about the execution.
+
+### Capturing Child Notebook Results as Span Attributes
+
+A key feature of the parent-child notebook tracing approach is the ability to capture the results returned by child notebooks as span attributes. This is done by parsing the JSON result returned by the child notebook and setting the values as span attributes:
+
+```python
+# Execute Child Notebook 1
+child1_result_json = dbutils.notebook.run("./child_notebook_1", timeout_seconds=600)
+child1_result = json.loads(child1_result_json)
+
+# Set span attributes based on child notebook results
+for key, value in child1_result.items():
+    if isinstance(value, (str, int, float, bool)):
+        workflow_otel_helper.set_span_attribute("Child_Notebook_1", key, value)
+```
+
+This approach allows you to capture detailed information about the execution of child notebooks without requiring OpenTelemetry instrumentation in each notebook.
+
+### Best Practices for Parent-Child Notebook Tracing
+
+1. **Create a span for each child notebook execution** to track the performance and results of each notebook.
+
+2. **Use span events** to mark significant points in the workflow, such as the start and completion of child notebook executions.
+
+3. **Capture child notebook results as span attributes** to provide detailed information about the execution.
+
+4. **Use try/finally blocks** to ensure spans are properly ended, even if exceptions occur.
+
+5. **Include error handling** to capture and report errors that occur during child notebook execution.
+
+6. **Use consistent naming conventions** for spans, attributes, and events across all notebook workflows.
+
+7. **Correlate spans using the workflow ID** to enable comprehensive analysis of the entire workflow.
+
 ## Next Steps
 
 - Explore the [Metrics Guide](metrics.md) for information on the metrics collected
 - See the [Azure Monitoring Guide](azure_monitoring.md) for instructions on querying and visualizing the trace data
 - Review the [ETL Simulation Guide](etl_simulation.md) for a complete example of tracing implementation
+- Check out the [Parent-Child Notebooks Guide](parent_child_notebooks.md) for details on instrumenting notebook workflows

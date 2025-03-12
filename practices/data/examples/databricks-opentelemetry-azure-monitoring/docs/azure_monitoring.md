@@ -294,8 +294,224 @@ dependencies
 
 7. **Document your queries**: Save and document your most useful queries for future reference and team knowledge sharing.
 
+## Parent-Child Notebook Queries
+
+The following queries are specific to the parent-child notebook example and can be used to analyze the execution of notebook workflows.
+
+### Querying Trace Data for Parent-Child Notebooks
+
+#### Query for `Notebook_Workflow` (Parent Span)
+
+```sql
+dependencies
+| where name == "Notebook_Workflow"
+| extend workflow_id = tostring(customDimensions["etl_pipeline_id"]),
+         total_records_processed = toint(customDimensions["total_records_processed"]),
+         total_errors = toint(customDimensions["total_errors"]),
+         workflow_success = tostring(customDimensions["workflow_success"]),
+         validation_status = tostring(customDimensions["validation_status"]),
+         aggregation_status_code = toint(customDimensions["aggregation_status_code"]),
+         validation_time_sec = todouble(customDimensions["validation_time_sec"]),
+         aggregation_time_sec = todouble(customDimensions["aggregation_time_sec"])
+| project timestamp, workflow_id, total_records_processed, total_errors, 
+          workflow_success, validation_status, aggregation_status_code,
+          validation_time_sec, aggregation_time_sec, duration
+| order by timestamp desc
+```
+
+#### Query for `Child_Notebook_1` (Data Validation Span)
+
+```sql
+dependencies
+| where name == "Child_Notebook_1"
+| extend workflow_id = tostring(customDimensions["etl_pipeline_id"]),
+         notebook_path = tostring(customDimensions["notebook_path"]),
+         task = tostring(customDimensions["task"]),
+         status = tostring(customDimensions["status"]),
+         total_records = toint(customDimensions["total_records"]),
+         validation_errors = toint(customDimensions["validation_errors"]),
+         processing_time_sec = todouble(customDimensions["processing_time_sec"]),
+         records_per_second = todouble(customDimensions["records_per_second"]),
+         error = tostring(customDimensions["error"]),
+         error_message = tostring(customDimensions["error_message"])
+| project timestamp, workflow_id, notebook_path, task, status, total_records, 
+          validation_errors, processing_time_sec, records_per_second, error, error_message, duration
+| order by timestamp desc
+```
+
+#### Query for `Child_Notebook_2` (Data Aggregation Span)
+
+```sql
+dependencies
+| where name == "Child_Notebook_2"
+| extend workflow_id = tostring(customDimensions["etl_pipeline_id"]),
+         notebook_path = tostring(customDimensions["notebook_path"]),
+         task = tostring(customDimensions["task"]),
+         status_code = toint(customDimensions["status_code"]),
+         num_aggregations = toint(customDimensions["num_aggregations"]),
+         execution_time_sec = todouble(customDimensions["execution_time_sec"]),
+         memory_usage_mb = todouble(customDimensions["memory_usage_mb"]),
+         aggregations_breakdown = tostring(customDimensions["aggregations_breakdown"]),
+         error = tostring(customDimensions["error"]),
+         error_message = tostring(customDimensions["error_message"])
+| project timestamp, workflow_id, notebook_path, task, status_code, num_aggregations, 
+          execution_time_sec, memory_usage_mb, aggregations_breakdown, error, error_message, duration
+| order by timestamp desc
+```
+
+### Querying Metrics Data for Parent-Child Notebooks
+
+#### Query for Notebook Workflow Metrics
+
+```sql
+customMetrics
+| where name in ("total_execution_time_sec", "total_records_processed", "error_count")
+| extend workflow_id = tostring(customDimensions["etl_pipeline_id"])
+| summarize count = sum(valueCount), avg_value = avg(value), max_value = max(value), min_value = min(value) by name, workflow_id, timestamp
+| order by timestamp desc
+```
+
+#### Query for Child Notebook 1 Metrics
+
+```sql
+customMetrics
+| where name in ("execution_time_sec", "records_processed", "validation_errors")
+| extend workflow_id = tostring(customDimensions["etl_pipeline_id"])
+| summarize count = sum(valueCount), avg_value = avg(value), max_value = max(value), min_value = min(value) by name, workflow_id, timestamp
+| order by timestamp desc
+```
+
+#### Query for Child Notebook 2 Metrics
+
+```sql
+customMetrics
+| where name in ("execution_time_sec", "aggregations_performed", "memory_usage_mb")
+| extend workflow_id = tostring(customDimensions["etl_pipeline_id"])
+| summarize count = sum(valueCount), avg_value = avg(value), max_value = max(value), min_value = min(value) by name, workflow_id, timestamp
+| order by timestamp desc
+```
+
+### Advanced Queries for Parent-Child Notebooks
+
+#### Finding Failed Notebook Workflows
+
+```sql
+dependencies
+| where name == "Notebook_Workflow"
+| extend workflow_id = tostring(customDimensions["etl_pipeline_id"]),
+         workflow_success = tostring(customDimensions["workflow_success"]),
+         total_errors = toint(customDimensions["total_errors"])
+| where workflow_success == "false" or total_errors > 0
+| project timestamp, workflow_id, workflow_success, total_errors
+| order by timestamp desc
+```
+
+#### Analyzing Child Notebook Performance
+
+```sql
+dependencies
+| where name in ("Child_Notebook_1", "Child_Notebook_2")
+| extend workflow_id = tostring(customDimensions["etl_pipeline_id"]),
+         notebook_name = name
+| extend execution_time = case(
+           notebook_name == "Child_Notebook_1", todouble(customDimensions["processing_time_sec"]),
+           notebook_name == "Child_Notebook_2", todouble(customDimensions["execution_time_sec"]),
+           0.0
+         )
+| summarize avg_execution_time = avg(execution_time), max_execution_time = max(execution_time) by notebook_name, bin(timestamp, 1d)
+| render timechart
+```
+
+#### Correlating Spans for a Specific Workflow
+
+```sql
+dependencies
+| where customDimensions.etl_pipeline_id == "your-workflow-id"
+| extend span_name = name,
+         workflow_id = tostring(customDimensions["etl_pipeline_id"]),
+         duration_sec = todouble(duration) / 1000
+| project timestamp, span_name, duration_sec, operation_Id
+| order by timestamp asc
+```
+
+### Visualizing Parent-Child Notebook Metrics
+
+When creating visualizations for parent-child notebook workflows, consider the following approaches:
+
+1. **Workflow Success Rate**: Create a chart showing the percentage of successful workflows over time
+   ```sql
+   dependencies
+   | where name == "Notebook_Workflow"
+   | extend workflow_success = tostring(customDimensions["workflow_success"])
+   | summarize success_count = countif(workflow_success == "true"), 
+              total_count = count() 
+              by bin(timestamp, 1d)
+   | extend success_rate = 100.0 * success_count / total_count
+   | project timestamp, success_rate
+   | render timechart
+   ```
+
+2. **Child Notebook Execution Time Comparison**: Compare the execution time of different child notebooks
+   ```sql
+   dependencies
+   | where name in ("Child_Notebook_1", "Child_Notebook_2")
+   | extend execution_time = case(
+     name == "Child_Notebook_1", todouble(customDimensions["processing_time_sec"]),
+     name == "Child_Notebook_2", todouble(customDimensions["execution_time_sec"]),
+     0.0
+   )
+   | summarize avg_execution_time = avg(execution_time), max_execution_time = max(execution_time) by name, bin(timestamp, 1d)
+   | render timechart
+   ```
+
+3. **Validation Error Trends**: Track validation errors over time
+   ```sql
+   dependencies
+   | where name == "Child_Notebook_1"
+   | extend validation_errors = toint(customDimensions["validation_errors"]),
+            total_records = toint(customDimensions["total_records"])
+   | summarize avg_errors = avg(validation_errors), 
+              avg_error_rate = 100.0 * avg(todouble(validation_errors) / todouble(total_records)) 
+              by bin(timestamp, 1d)
+   | render timechart
+   ```
+
+### Alert Examples for Parent-Child Notebooks
+
+#### Alert for Failed Notebook Workflows
+
+```sql
+dependencies
+| where name == "Notebook_Workflow"
+| extend workflow_success = tostring(customDimensions["workflow_success"])
+| where workflow_success == "false"
+| count
+```
+
+#### Alert for High Validation Error Rate
+
+```sql
+dependencies
+| where name == "Child_Notebook_1"
+| extend validation_errors = toint(customDimensions["validation_errors"]),
+         total_records = toint(customDimensions["total_records"])
+| extend error_rate = (todouble(validation_errors) / todouble(total_records)) * 100
+| where error_rate > 5
+```
+
+#### Alert for Slow Child Notebook Execution
+
+```sql
+dependencies
+| where name == "Child_Notebook_2"
+| extend execution_time_sec = todouble(customDimensions["execution_time_sec"])
+| where execution_time_sec > 10 // Alert if execution takes more than 10 seconds
+| count
+```
+
 ## Next Steps
 
 - Review the [Tracing Guide](tracing.md) for details on the trace attributes and components
 - Explore the [Metrics Guide](metrics.md) for information on the metrics collected
 - See the [ETL Simulation Guide](etl_simulation.md) for a complete example of OpenTelemetry implementation
+- Check out the [Parent-Child Notebooks Guide](parent_child_notebooks.md) for details on instrumenting notebook workflows

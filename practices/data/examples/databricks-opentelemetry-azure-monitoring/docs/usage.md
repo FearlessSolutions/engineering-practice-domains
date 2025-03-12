@@ -199,6 +199,87 @@ finally:
 
 7. **Include error information**: When errors occur, set error attributes to make troubleshooting easier.
 
+## Parent-Child Notebook Instrumentation
+
+You can use OpenTelemetry to instrument parent notebooks that call child notebooks using `dbutils.notebook.run()`. This approach allows you to monitor the execution of child notebooks without adding OpenTelemetry instrumentation to each child notebook.
+
+### Basic Approach
+
+1. Create a parent span in the parent notebook
+2. Create child spans for each child notebook execution
+3. Execute child notebooks using `dbutils.notebook.run()`
+4. Capture return values from child notebooks
+5. Use these return values as span attributes and metrics
+
+### Example
+
+Here's a simplified example of instrumenting a parent notebook that calls child notebooks:
+
+```python
+import json
+from otel_helper import OpenTelemetryHelper
+
+# Initialize OpenTelemetry
+workflow_id = str(uuid.uuid4())
+otel_helper = OpenTelemetryHelper(
+    span_name="Parent_Notebook",
+    etl_pipeline_id=workflow_id
+)
+
+# Start a span for the child notebook execution
+otel_helper.start_tracing("Child_Notebook_1")
+
+try:
+    # Execute the child notebook
+    child_result_json = dbutils.notebook.run("./child_notebook_1", timeout_seconds=600)
+    
+    # Parse the JSON result
+    child_result = json.loads(child_result_json)
+    
+    # Set span attributes based on child notebook results
+    for key, value in child_result.items():
+        if isinstance(value, (str, int, float, bool)):
+            otel_helper.set_span_attribute("Child_Notebook_1", key, value)
+    
+    # Add a span event for the completion
+    otel_helper.add_span_event("Child_Notebook_1", "Child Notebook Execution Completed", {
+        "status": child_result["status"]
+    })
+    
+finally:
+    # End the child notebook span
+    otel_helper.end_tracing("Child_Notebook_1")
+
+# End the parent span when the workflow is complete
+otel_helper.end_tracing("Parent_Notebook")
+```
+
+### Child Notebook Return Values
+
+Child notebooks should return structured data that can be used as span attributes or metrics. For example:
+
+```python
+# In the child notebook
+result = {
+    "status": "Success",
+    "records_processed": 10000,
+    "processing_time_sec": 5.2
+}
+
+# Return the result to the parent notebook
+dbutils.notebook.exit(json.dumps(result))
+```
+
+### Complete Example
+
+For a complete example of parent-child notebook instrumentation, see the `examples/parent_notebook_with_otel.py` notebook in this project. This example demonstrates:
+
+- Creating a parent span for the entire workflow
+- Executing multiple child notebooks
+- Capturing return values from child notebooks
+- Adding span attributes and metrics based on child notebook results
+- Using span events to mark significant points in the workflow
+
 ## Additional Documentation
 
 For more detailed information about using OpenTelemetry with this project, refer to these guides:

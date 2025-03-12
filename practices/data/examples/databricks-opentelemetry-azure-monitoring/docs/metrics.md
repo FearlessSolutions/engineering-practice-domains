@@ -168,8 +168,92 @@ Once exported to Azure Monitor, metrics can be:
 
 See the [Azure Monitoring Guide](azure_monitoring.md) for detailed instructions on working with metrics in Azure Monitor.
 
+## Parent-Child Notebook Metrics
+
+In addition to the ETL simulation metrics, the parent-child notebook example demonstrates how to use metrics to monitor notebook workflows. These metrics provide insights into the performance and reliability of notebook executions.
+
+### Metrics Configuration for Parent-Child Notebooks
+
+Metrics for the parent-child notebook example are configured during the initialization of the OpenTelemetryHelper:
+
+```python
+workflow_otel_helper = OpenTelemetryHelper(
+    span_name="Notebook_Workflow",
+    etl_pipeline_id=workflow_id,
+    span_metrics={
+        "Notebook_Workflow": {
+            "total_execution_time_sec": "histogram",
+            "total_records_processed": "counter",
+            "error_count": "counter"
+        },
+        "Child_Notebook_1": {
+            "execution_time_sec": "histogram",
+            "records_processed": "counter",
+            "validation_errors": "counter"
+        },
+        "Child_Notebook_2": {
+            "execution_time_sec": "histogram",
+            "aggregations_performed": "counter",
+            "memory_usage_mb": "histogram"
+        }
+    },
+    span_attributes={
+        "workflow_type": "Data Processing Pipeline",
+        "environment": "Development"
+    }
+)
+```
+
+### Parent-Child Notebook Metrics Table
+
+The following table provides details on all metrics used in the parent-child notebook example:
+
+| **Metric Name**                | **Type**   | **Stage**           | **Description**                                                                 |
+|--------------------------------|------------|---------------------|---------------------------------------------------------------------------------|
+| `total_execution_time_sec`     | Histogram  | Notebook_Workflow   | Total duration (in seconds) of the entire notebook workflow.                    |
+| `total_records_processed`      | Counter    | Notebook_Workflow   | Total number of records processed across all child notebooks.                   |
+| `error_count`                  | Counter    | Notebook_Workflow   | Total count of errors encountered during the workflow execution.                |
+| `execution_time_sec`           | Histogram  | Child_Notebook_1    | Duration (in seconds) of the data validation notebook execution.                |
+| `records_processed`            | Counter    | Child_Notebook_1    | Number of records processed in the data validation notebook.                    |
+| `validation_errors`            | Counter    | Child_Notebook_1    | Number of validation errors found during data validation.                       |
+| `execution_time_sec`           | Histogram  | Child_Notebook_2    | Duration (in seconds) of the data aggregation notebook execution.               |
+| `aggregations_performed`       | Counter    | Child_Notebook_2    | Number of aggregation operations performed in the data aggregation notebook.    |
+| `memory_usage_mb`              | Histogram  | Child_Notebook_2    | Memory usage (in MB) during the data aggregation notebook execution.            |
+
+### Recording Metrics from Child Notebook Results
+
+A key feature of the parent-child notebook example is the ability to record metrics based on the results returned by child notebooks. This is done by parsing the JSON result returned by the child notebook and using the values to record metrics:
+
+```python
+# Execute Child Notebook 1
+child1_result_json = dbutils.notebook.run("./child_notebook_1", timeout_seconds=600)
+child1_result = json.loads(child1_result_json)
+
+# Record metrics based on child notebook results
+workflow_otel_helper.record_metric("Child_Notebook_1", "execution_time_sec", child1_result["processing_time_sec"])
+workflow_otel_helper.record_metric("Child_Notebook_1", "records_processed", child1_result["total_records"])
+workflow_otel_helper.record_metric("Child_Notebook_1", "validation_errors", child1_result["validation_errors"])
+```
+
+This approach allows you to collect metrics from child notebooks without requiring OpenTelemetry instrumentation in each notebook.
+
+### Best Practices for Parent-Child Notebook Metrics
+
+1. **Define consistent return structures** for child notebooks to ensure reliable metric recording.
+
+2. **Use try/catch blocks** when parsing child notebook results to handle unexpected return values.
+
+3. **Record overall workflow metrics** that aggregate results from all child notebooks.
+
+4. **Include error counts** to track the reliability of notebook executions.
+
+5. **Monitor execution times** to identify performance bottlenecks in specific notebooks.
+
+6. **Use the workflow ID** to correlate metrics across all notebooks in the workflow.
+
 ## Next Steps
 
 - Review the [Tracing Guide](tracing.md) for details on the trace attributes and components
 - See the [Azure Monitoring Guide](azure_monitoring.md) for instructions on querying and visualizing the metric data
 - Explore the [ETL Simulation Guide](etl_simulation.md) for a complete example of metrics implementation
+- Check out the [Parent-Child Notebooks Guide](parent_child_notebooks.md) for details on instrumenting notebook workflows

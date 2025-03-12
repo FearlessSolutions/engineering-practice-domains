@@ -84,12 +84,16 @@ The `databricks-opentelemetry-azure-monitoring/examples` directory contains samp
 
 - `etl_simulation_before.py`: A basic ETL pipeline without instrumentation
 - `etl_simulation_with_otel.py`: The same ETL pipeline with OpenTelemetry instrumentation
+- `parent_notebook_with_otel.py`: A parent notebook that uses OpenTelemetry to instrument child notebook executions
+  - `child_notebook_1.py`: A child notebook that performs data validation (no OpenTelemetry instrumentation)
+  - `child_notebook_2.py`: A child notebook that performs data aggregation (no OpenTelemetry instrumentation)
 
 ## Documentation
 
 - [Setup Guide](docs/setup.md): Detailed setup instructions
 - [Usage Guide](docs/usage.md): How to use the library in your notebooks
 - [ETL Simulation Guide](docs/etl_simulation.md): Information about the simulated ETL with and without OpenTelemetry
+- [Parent-Child Notebooks Guide](docs/parent_child_notebooks.md): How to instrument parent notebooks that call child notebooks
 - [Tracing Guide](docs/tracing.md): Details about tracing attributes, components, and the OpenTelemetry Span Summary
 - [Metrics Guide](docs/metrics.md): Information about metric values and instrumentation
 - [Azure Monitoring Guide](docs/azure_monitoring.md): Querying data in Azure Application Insights, viewing metrics, and setting up visualizations and alerts
