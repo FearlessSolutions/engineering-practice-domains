@@ -8,12 +8,18 @@ This directory provides a framework and examples for adding OpenTelemetry instru
 
 ## Features
 
-- OpenTelemetry instrumentation for Databricks notebooks
-- Integration with Azure Application Insights
-- Tracing for ETL pipeline stages (extraction, transformation, loading)
-- Custom metrics collection
-- Span attributes for detailed monitoring
-- Function decorators for automatic tracing
+- Flexible OpenTelemetryHelper class that encapsulates OpenTelemetry functionality
+- Integration with Azure Application Insights for monitoring and alerting
+- Comprehensive tracing for ETL pipeline stages (extraction, transformation, loading)
+- Parent-child notebook workflow monitoring with two approaches:
+  - Monitoring without modifying child notebooks
+  - Alternative approach for directly instrumenting child notebooks with passed context
+- Custom metrics collection and visualization
+- Span attributes for detailed monitoring and troubleshooting
+- Function decorators for automatic tracing with minimal code changes
+- Comprehensive documentation for setup, usage, and monitoring
+- Multiple installation options for different use cases
+- Ready-to-use examples of instrumented ETL pipelines and notebook workflows
 
 ## Getting Started
 
