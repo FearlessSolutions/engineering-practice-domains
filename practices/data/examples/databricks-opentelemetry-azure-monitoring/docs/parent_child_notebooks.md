@@ -227,6 +227,107 @@ To implement this approach in your own notebook workflows:
 4. **Capture return values** from child notebooks and use them as span attributes and metrics
 5. **Add span events** to mark significant points in the workflow
 
+## Alternative Approach: Instrumented Child Notebooks
+
+While the primary approach described in this guide keeps OpenTelemetry instrumentation confined to the parent notebook, there may be scenarios where you want child notebooks to directly log their own span attributes and metrics. This section describes how to implement this alternative approach.
+
+### Passing Context Information
+
+Since you cannot directly pass Python objects (like the OpenTelemetryHelper instance) between notebooks, you need to pass context information that allows child notebooks to create properly correlated spans:
+
+```python
+# Parent notebook
+workflow_id = str(uuid.uuid4())
+parent_otel_helper = OpenTelemetryHelper(
+    span_name="Notebook_Workflow",
+    etl_pipeline_id=workflow_id,
+    # Other configuration...
+)
+
+# Pass context to child notebook
+child1_result_json = dbutils.notebook.run(
+    "./child_notebook_1", 
+    timeout_seconds=600,
+    arguments={
+        "workflow_id": workflow_id, 
+        "parent_span": "Notebook_Workflow"
+    }
+)
+```
+
+### Initializing OpenTelemetryHelper in Child Notebooks
+
+In the child notebook, retrieve the context information and initialize a new OpenTelemetryHelper instance:
+
+```python
+# Child notebook
+# Retrieve context from parent
+workflow_id = dbutils.notebook.getArgument("workflow_id")
+parent_span = dbutils.notebook.getArgument("parent_span")
+
+# Initialize OpenTelemetryHelper with the same workflow_id
+child_otel_helper = OpenTelemetryHelper(
+    span_name="Child_Notebook_1",
+    etl_pipeline_id=workflow_id,
+    span_metrics={
+        "Child_Notebook_1": {
+            "execution_time_sec": "histogram",
+            "records_processed": "counter",
+            "validation_errors": "counter"
+        }
+    },
+    span_attributes={
+        "parent_span": parent_span,  # Link to parent span
+        "notebook_type": "child"
+    }
+)
+
+# Use the helper to record metrics and set attributes directly
+child_otel_helper.record_metric("Child_Notebook_1", "records_processed", total_records)
+child_otel_helper.set_span_attribute("Child_Notebook_1", "validation_status", validation_status)
+
+# Don't forget to end tracing before exiting
+child_otel_helper.end_tracing("Child_Notebook_1")
+
+# Still return structured data to parent
+result = {
+    "task": "data_validation",
+    "status": validation_status,
+    # Other result data...
+}
+dbutils.notebook.exit(json.dumps(result))
+```
+
+### Ensuring Proper Correlation
+
+To ensure proper correlation between parent and child spans:
+
+1. **Use the same workflow_id**: Pass the workflow_id from parent to child to ensure all spans are part of the same trace
+2. **Reference the parent span**: Set a span attribute in the child that references the parent span name
+3. **Use consistent naming**: Use a consistent naming convention for spans across notebooks
+4. **Configure the same exporter**: Ensure all notebooks use the same Azure Monitor connection string
+
+### Benefits and Trade-offs
+
+**Benefits:**
+- More detailed instrumentation: Child notebooks can add span attributes and events based on their internal processing
+- Real-time metrics: Child notebooks can record metrics as they process data, rather than only at completion
+- Finer-grained error tracking: Capture and report errors directly where they occur
+
+**Trade-offs:**
+- Increased complexity: Each notebook requires OpenTelemetry instrumentation
+- Duplication: Configuration and setup code is duplicated across notebooks
+- Maintenance overhead: Changes to instrumentation approach require updates to multiple notebooks
+- Potential for inconsistency: Different notebooks might implement instrumentation differently
+
+### When to Use This Approach
+
+Consider using instrumented child notebooks when:
+- Child notebooks contain complex logic that benefits from detailed internal instrumentation
+- You need to capture metrics at specific points during child notebook execution
+- Child notebooks are long-running and you want to track progress in real-time
+- You need to capture detailed error information within child notebooks
+
 ## Next Steps
 
 - Review the [Azure Monitoring Guide](azure_monitoring.md) for instructions on querying and visualizing the parent-child notebook telemetry data
