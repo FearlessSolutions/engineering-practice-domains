@@ -2,6 +2,33 @@
 
 This guide provides detailed information on how to query, visualize, and set up alerts for the OpenTelemetry data exported to Azure Application Insights.
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Querying Data in Azure Application Insights](#querying-data-in-azure-application-insights)
+  - [Accessing the Query Editor](#accessing-the-query-editor)
+  - [Querying Trace Data](#querying-trace-data)
+  - [Querying Metrics Data](#querying-metrics-data)
+- [Advanced Queries](#advanced-queries)
+  - [Finding Failed ETL Runs](#finding-failed-etl-runs)
+  - [Analyzing ETL Performance Trends](#analyzing-etl-performance-trends)
+  - [Correlating Spans for a Specific ETL Run](#correlating-spans-for-a-specific-etl-run)
+- [Viewing Metrics in Azure Monitor](#viewing-metrics-in-azure-monitor)
+  - [Using the Metrics Explorer](#using-the-metrics-explorer)
+  - [Creating Custom Charts](#creating-custom-charts)
+- [Metrics Visualization & Alerts](#metrics-visualization--alerts)
+  - [Creating a Dashboard](#creating-a-dashboard)
+  - [Setting Up Alerts](#setting-up-alerts)
+  - [Example Alert Queries](#example-alert-queries)
+- [Best Practices for Azure Monitoring](#best-practices-for-azure-monitoring)
+- [Parent-Child Notebook Queries](#parent-child-notebook-queries)
+  - [Querying Trace Data for Parent-Child Notebooks](#querying-trace-data-for-parent-child-notebooks)
+  - [Querying Metrics Data for Parent-Child Notebooks](#querying-metrics-data-for-parent-child-notebooks)
+  - [Advanced Queries for Parent-Child Notebooks](#advanced-queries-for-parent-child-notebooks)
+  - [Visualizing Parent-Child Notebook Metrics](#visualizing-parent-child-notebook-metrics)
+  - [Alert Examples for Parent-Child Notebooks](#alert-examples-for-parent-child-notebooks)
+- [Next Steps](#next-steps)
+
 ## Overview
 
 The OpenTelemetry instrumentation in this project exports both traces and metrics to Azure Application Insights, allowing you to:

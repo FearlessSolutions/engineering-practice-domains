@@ -2,6 +2,16 @@
 
 This guide explains the simulated ETL pipeline examples provided in this project, comparing the implementation with and without OpenTelemetry instrumentation.
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Notebook Cell Summaries](#notebook-cell-summaries)
+- [Comparing ETL With and Without OpenTelemetry](#comparing-etl-with-and-without-opentelemetry)
+  - [Without OpenTelemetry](#without-opentelemetry-etl_simulation_beforepy)
+  - [With OpenTelemetry](#with-opentelemetry-etl_simulation_with_otelpy)
+- [Benefits of OpenTelemetry Instrumentation](#benefits-of-opentelemetry-instrumentation)
+- [Next Steps](#next-steps)
+
 ## Overview
 
 The project includes two example notebooks that demonstrate a simulated ETL (Extract, Transform, Load) pipeline:

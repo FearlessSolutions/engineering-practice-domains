@@ -2,6 +2,28 @@
 
 This guide provides detailed information about the OpenTelemetry tracing instrumentation used in this project, including span attributes, components, and the overall span structure.
 
+## Table of Contents
+
+- [Tracing Instrumentation Overview](#tracing-instrumentation-overview)
+- [Span Structure](#span-structure)
+- [OpenTelemetry Span Summary](#opentelemetry-span-summary)
+- [Detailed Span Trace Attributes](#detailed-span-trace-attributes)
+  - [ETL_Pipeline (Parent Span)](#etl_pipeline-parent-span)
+  - [DataExtraction (API Call Span)](#dataextraction-api-call-span)
+  - [DataTransformation (Processing Span)](#datatransformation-processing-span)
+  - [DataLoading (Storage Span)](#dataloading-storage-span)
+- [Span Events](#span-events)
+- [Implementing Tracing in Your Code](#implementing-tracing-in-your-code)
+- [Best Practices for Tracing](#best-practices-for-tracing)
+- [Parent-Child Notebook Tracing](#parent-child-notebook-tracing)
+  - [Span Structure for Parent-Child Notebooks](#span-structure-for-parent-child-notebooks)
+  - [Detailed Span Trace Attributes for Parent-Child Notebooks](#detailed-span-trace-attributes-for-parent-child-notebooks)
+  - [Span Events in Parent-Child Notebooks](#span-events-in-parent-child-notebooks)
+  - [Capturing Child Notebook Results as Span Attributes](#capturing-child-notebook-results-as-span-attributes)
+  - [Best Practices for Parent-Child Notebook Tracing](#best-practices-for-parent-child-notebook-tracing)
+  - [Alternative Approach: Instrumented Child Notebooks](#alternative-approach-instrumented-child-notebooks)
+- [Next Steps](#next-steps)
+
 ## Tracing Instrumentation Overview
 
 The ETL simulation is instrumented with OpenTelemetry tracing to provide detailed insights into the execution flow and performance characteristics of each stage of the pipeline. Tracing creates a hierarchical representation of the ETL process, with a parent span for the overall pipeline and child spans for each stage.

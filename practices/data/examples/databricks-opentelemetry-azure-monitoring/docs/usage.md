@@ -2,6 +2,28 @@
 
 This guide provides instructions and examples for using the OpenTelemetry instrumentation in your Databricks notebooks.
 
+## Table of Contents
+
+- [Basic Usage](#basic-usage)
+  - [Importing the Helper Class](#importing-the-helper-class)
+  - [Initializing OpenTelemetry](#initializing-opentelemetry)
+  - [Configuring Metrics](#configuring-metrics)
+- [Creating and Managing Spans](#creating-and-managing-spans)
+  - [Starting a Span](#starting-a-span)
+  - [Setting Span Attributes](#setting-span-attributes)
+  - [Recording Metrics](#recording-metrics)
+  - [Adding Span Events](#adding-span-events)
+  - [Ending a Span](#ending-a-span)
+- [Using the Function Decorator](#using-the-function-decorator)
+- [Complete Example](#complete-example)
+- [Best Practices](#best-practices)
+- [Parent-Child Notebook Instrumentation](#parent-child-notebook-instrumentation)
+  - [Basic Approach](#basic-approach)
+  - [Example](#example)
+  - [Child Notebook Return Values](#child-notebook-return-values)
+  - [Complete Example](#complete-example-1)
+- [Additional Documentation](#additional-documentation)
+
 ## Basic Usage
 
 ### Importing the Helper Class

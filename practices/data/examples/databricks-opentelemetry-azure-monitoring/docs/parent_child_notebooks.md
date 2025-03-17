@@ -2,6 +2,32 @@
 
 This guide explains the parent-child notebook example provided in this project, demonstrating how to use OpenTelemetry to instrument a parent notebook that calls child notebooks using `dbutils.notebook.run()`.
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Key Concepts](#key-concepts)
+  - [Parent-Child Notebook Architecture](#parent-child-notebook-architecture)
+  - [OpenTelemetry Instrumentation Approach](#opentelemetry-instrumentation-approach)
+- [Notebook Cell Summaries](#notebook-cell-summaries)
+- [Child Notebook Implementation](#child-notebook-implementation)
+  - [Child Notebook 1: Data Validation](#child-notebook-1-data-validation)
+  - [Child Notebook 2: Data Aggregation](#child-notebook-2-data-aggregation)
+- [Span Structure](#span-structure)
+- [OpenTelemetry Span Summary](#opentelemetry-span-summary)
+- [Span Events](#span-events)
+- [Benefits of This Approach](#benefits-of-this-approach)
+- [Implementing in Your Own Workflows](#implementing-in-your-own-workflows)
+  - [Simplified Approach Using Helper Methods](#simplified-approach-using-helper-methods)
+  - [1. run_notebook_with_tracing](#1-run_notebook_with_tracing)
+  - [2. instrument_function](#2-instrument_function)
+- [Alternative Approach: Instrumented Child Notebooks](#alternative-approach-instrumented-child-notebooks)
+  - [Passing Context Information](#passing-context-information)
+  - [Initializing OpenTelemetryHelper in Child Notebooks](#initializing-opentelemetryhelper-in-child-notebooks)
+  - [Ensuring Proper Correlation](#ensuring-proper-correlation)
+  - [Benefits and Trade-offs](#benefits-and-trade-offs)
+  - [When to Use This Approach](#when-to-use-this-approach)
+- [Next Steps](#next-steps)
+
 ## Overview
 
 The project includes three example notebooks that demonstrate a parent-child notebook workflow:

@@ -2,6 +2,18 @@
 
 This guide provides detailed instructions for setting up the Databricks OpenTelemetry Azure Monitoring integration.
 
+## Table of Contents
+
+- [Quick Start: Direct File Upload (Recommended)](#quick-start-direct-file-upload-recommended)
+- [Azure Application Insights Setup](#azure-application-insights-setup)
+- [Databricks Cluster Setup](#databricks-cluster-setup)
+- [Project Setup Options](#project-setup-options)
+  - [Option 1: Direct File Upload (Recommended)](#option-1-direct-file-upload-recommended)
+  - [Option 2: Install as a Python package](#option-2-install-as-a-python-package)
+  - [Option 3: Use the files with manual dependency installation](#option-3-use-the-files-with-manual-dependency-installation)
+- [Verification](#verification)
+- [Troubleshooting](#troubleshooting)
+
 ## Quick Start: Direct File Upload (Recommended)
 
 The simplest way to use this integration in Databricks is to upload the `otel_helper.py` file directly to your workspace:

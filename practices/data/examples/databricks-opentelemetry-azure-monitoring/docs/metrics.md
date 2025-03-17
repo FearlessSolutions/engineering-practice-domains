@@ -2,6 +2,24 @@
 
 This guide provides detailed information about the OpenTelemetry metrics instrumentation used in this project, including metric types, values, and how to use them for monitoring your ETL pipelines.
 
+## Table of Contents
+
+- [Metrics Instrumentation Overview](#metrics-instrumentation-overview)
+- [Metric Types](#metric-types)
+- [Metrics Configuration](#metrics-configuration)
+- [Metrics Table](#metrics-table)
+- [Recording Metrics](#recording-metrics)
+- [Metric Attributes](#metric-attributes)
+- [Implementing Metrics in Your Code](#implementing-metrics-in-your-code)
+- [Best Practices for Metrics](#best-practices-for-metrics)
+- [Viewing Metrics in Azure Monitor](#viewing-metrics-in-azure-monitor)
+- [Parent-Child Notebook Metrics](#parent-child-notebook-metrics)
+  - [Metrics Configuration for Parent-Child Notebooks](#metrics-configuration-for-parent-child-notebooks)
+  - [Parent-Child Notebook Metrics Table](#parent-child-notebook-metrics-table)
+  - [Recording Metrics from Child Notebook Results](#recording-metrics-from-child-notebook-results)
+  - [Best Practices for Parent-Child Notebook Metrics](#best-practices-for-parent-child-notebook-metrics)
+- [Next Steps](#next-steps)
+
 ## Metrics Instrumentation Overview
 
 In addition to tracing, the ETL simulation is instrumented with OpenTelemetry metrics to provide real-time performance insights. These custom metric instruments are exported to Azure Monitor Application Insights, allowing you to:
