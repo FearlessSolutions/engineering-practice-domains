@@ -1,14 +1,14 @@
 import os
 import time
 import json
-import uuid
 import functools
+from azure.monitor.opentelemetry.exporter import AzureMonitorTraceExporter, AzureMonitorMetricExporter
+from databricks.sdk.runtime import dbutils
 from opentelemetry import trace, metrics
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.sdk.metrics import MeterProvider
 from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader
-from azure.monitor.opentelemetry.exporter import AzureMonitorTraceExporter, AzureMonitorMetricExporter
 
 class OpenTelemetryHelper:
     """Encapsulates OpenTelemetry tracing, trace attributes, and metrics integration.
@@ -183,6 +183,204 @@ class OpenTelemetryHelper:
         else:
             raise KeyError(f"Tracing span '{span_name}' not found!")
             
+    def _trace_execution(self, span_name, func, func_args=None, func_kwargs=None, 
+                        attributes_mapping=None, additional_attributes=None, 
+                        pre_execution_callback=None, post_execution_callback=None):
+        """
+        Private helper method to handle common tracing logic.
+        
+        :param span_name: Name of the span to create
+        :param func: Function to execute
+        :param func_args: Arguments to pass to the function (tuple)
+        :param func_kwargs: Keyword arguments to pass to the function (dict)
+        :param attributes_mapping: Dictionary mapping span attribute names to function return dict keys
+        :param additional_attributes: Additional attributes to set on the span
+        :param pre_execution_callback: Function to call before executing func (receives span_name)
+        :param post_execution_callback: Function to call after executing func but before ending span (receives span_name, result)
+        :return: Result of the function execution
+        """
+        func_args = func_args or ()
+        func_kwargs = func_kwargs or {}
+        additional_attributes = additional_attributes or {}
+        
+        # Start tracing with base attributes
+        span_attributes = {"etl_pipeline_id": self.etl_pipeline_id}
+        span_attributes.update(additional_attributes)
+        
+        self.start_tracing(span_name, span_attributes)
+        
+        # Set function name as a span attribute if available
+        if hasattr(func, "__name__"):
+            self.set_span_attribute(span_name, "function_name", func.__name__)
+            print(f"Started tracing for function '{func.__name__}' with span '{span_name}'")
+        
+        # Execute pre-execution callback if provided
+        if pre_execution_callback:
+            pre_execution_callback(span_name)
+        
+        result = None
+        error = None
+        
+        try:
+            # Execute the function
+            result = func(*func_args, **func_kwargs)
+            
+            # Process the result
+            if isinstance(result, dict):
+                # Set span attributes from the function's return value
+                if attributes_mapping:
+                    for attr_name, result_key in attributes_mapping.items():
+                        if result_key in result:
+                            self.set_span_attribute(span_name, attr_name, result[result_key])
+                
+                # Record metrics if applicable
+                if span_name in self.metrics_registry:
+                    for metric_name in self.metrics_registry[span_name]:
+                        if metric_name in result:
+                            # Add type checking before recording the metric
+                            if isinstance(result[metric_name], (int, float)):
+                                self.record_metric(span_name, metric_name, result[metric_name])
+                            else:
+                                print(f"Warning: Metric '{metric_name}' value is not a number, skipping")
+            
+            return result
+            
+        except Exception as e:
+            # Set error attributes
+            error_msg = str(e)
+            self.set_span_attribute(span_name, "error", "true")
+            self.set_span_attribute(span_name, "error_message", error_msg)
+            error = e
+            raise
+            
+        finally:
+            # Execute post-execution callback if provided (before ending the span)
+            processed_result = None
+            if post_execution_callback and result is not None:
+                try:
+                    processed_result = post_execution_callback(span_name, result)
+                except Exception as callback_error:
+                    # Log the callback error but don't override the original error if there was one
+                    print(f"Error in post-execution callback: {str(callback_error)}")
+                    if error is None:
+                        # Only set error attributes if there wasn't already an error
+                        self.set_span_attribute(span_name, "error", "true")
+                        self.set_span_attribute(span_name, "error_message", f"Post-execution callback error: {str(callback_error)}")
+            
+            # End tracing
+            self.end_tracing(span_name)
+            if hasattr(func, "__name__"):
+                print(f"Ended tracing for function '{func.__name__}' with span '{span_name}'")
+    
+    def instrument_function(self, function, span_name=None, attributes_mapping=None):
+        """
+        Wraps a function with OpenTelemetry tracing.
+        
+        :param function: The function to wrap
+        :param span_name: Name for the span (defaults to function name)
+        :param attributes_mapping: Dictionary mapping span attribute names to function return dict keys
+        :return: Wrapped function
+        
+        Example usage:
+        
+        run_traced_notebook = workflow_otel_helper.instrument_function(
+            dbutils.notebook.run,
+            span_name="Child_Notebook_2"
+        )
+        
+        child2_result_json = run_traced_notebook("./child_notebook_2", timeout_seconds=600)
+        """
+        # Use function name as default span name if not provided
+        if span_name is None:
+            span_name = function.__name__
+        
+        outer_self = self
+        
+        @functools.wraps(function)
+        def trace_wrapper(*args, **kwargs):
+            return outer_self._trace_execution(
+                span_name=span_name,
+                func=function,
+                func_args=args,
+                func_kwargs=kwargs,
+                attributes_mapping=attributes_mapping
+            )
+        
+        return trace_wrapper
+    
+    def run_notebook_with_tracing(self, notebook_path, span_name=None, timeout_seconds=600, arguments=None, **kwargs):
+        """
+        Wrapper around dbutils.notebook.run that automatically handles tracing.
+        
+        :param notebook_path: Path to the notebook to run
+        :param span_name: Name for the span (defaults to notebook name if not provided)
+        :param timeout_seconds: Timeout for notebook execution
+        :param arguments: Arguments to pass to the notebook
+        :param kwargs: Additional keyword arguments to include as span attributes
+        :return: The parsed result from the notebook execution (as a dictionary if JSON, otherwise as string)
+        
+        Example usage:
+        
+        child1_result = workflow_otel_helper.run_notebook_with_tracing(
+            "./child_notebook_1", 
+            span_name="Child_Notebook_1",
+            timeout_seconds=600,
+            notebook_type="validation"
+        )
+        """
+        # Extract notebook name from path if span_name not provided
+        if span_name is None:
+            span_name = notebook_path.split('/')[-1].replace('.', '_')
+        
+        # Define notebook-specific callbacks
+        def pre_execution(span_name):
+            self.add_span_event(span_name, "Notebook Execution Started", {
+                "notebook_path": notebook_path,
+                "timestamp": time.time()
+            })
+        
+        def post_execution(span_name, result_json):
+            # Add events but don't try to parse JSON here
+            # We'll parse it after the span is ended
+            self.add_span_event(span_name, "Notebook Execution Completed", {
+                "timestamp": time.time()
+            })
+        
+        # Define error handler for notebook execution
+        def notebook_error_handler(e):
+            error_msg = str(e)
+            self.add_span_event(span_name, "Notebook Execution Failed", {
+                "error_message": error_msg,
+                "timestamp": time.time()
+            })
+        
+        # Execute notebook with tracing
+        try:
+            result_json = self._trace_execution(
+                span_name=span_name,
+                func=dbutils.notebook.run,
+                func_args=(notebook_path, timeout_seconds, arguments),
+                additional_attributes={"notebook_path": notebook_path, **kwargs},
+                pre_execution_callback=pre_execution,
+                post_execution_callback=post_execution
+            )
+            
+            # Now parse the JSON after the span has been ended
+            try:
+                # Parse the result if it's JSON
+                result = json.loads(result_json)
+                
+                # Return the parsed result
+                return result
+            except json.JSONDecodeError:
+                # If result is not JSON, just return it as is
+                return result_json
+                
+        except Exception as e:
+            # This will only be called if an error occurs that wasn't caught by _trace_execution
+            notebook_error_handler(e)
+            raise
+    
     def trace_function(self, span_name, attributes_mapping=None):
         """
         Decorator for tracing function execution.
@@ -207,38 +405,12 @@ class OpenTelemetryHelper:
         def decorator(func):
             @functools.wraps(func)
             def wrapper(*args, **kwargs):
-                # Start the span
-                self.start_tracing(span_name, {"etl_pipeline_id": self.etl_pipeline_id})
-                # Add function name as a span attribute
-                self.set_span_attribute(span_name, "function_name", func.__name__)
-                print(f"Started tracing for function '{func.__name__}' with span '{span_name}'")
-                
-                try:
-                    # Execute the function
-                    result = func(*args, **kwargs)
-                    
-                    # Set span attributes from the function's return value
-                    if attributes_mapping and isinstance(result, dict):
-                        for attr_name, result_key in attributes_mapping.items():
-                            if result_key in result:
-                                self.set_span_attribute(span_name, attr_name, result[result_key])
-                    
-                    # Record metrics if applicable
-                    if span_name in self.metrics_registry:
-                        for metric_name in self.metrics_registry[span_name]:
-                            if metric_name in result:
-                                self.record_metric(span_name, metric_name, result[metric_name])
-                    
-                    return result
-                except Exception as e:
-                    # Set error attributes
-                    self.set_span_attribute(span_name, "error", "true")
-                    self.set_span_attribute(span_name, "error_message", str(e))
-                    raise
-                finally:
-                    # End the span
-                    self.end_tracing(span_name)
-                    print(f"Ended tracing for function '{func.__name__}' with span '{span_name}'")
-            
+                return self._trace_execution(
+                    span_name=span_name,
+                    func=func,
+                    func_args=args,
+                    func_kwargs=kwargs,
+                    attributes_mapping=attributes_mapping
+                )
             return wrapper
         return decorator
