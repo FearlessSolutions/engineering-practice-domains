@@ -84,19 +84,23 @@ The parent notebook (`parent_notebook_with_otel.py`) contains the following key 
    ```
 
 5. **Execute Child Notebook 1**  
-   - Starts a span for the child notebook execution
-   - Adds a span event to mark the start of the child notebook
-   - Executes the child notebook using dbutils.notebook.run()
-   - Parses the JSON result returned by the child notebook
-   - Sets span attributes based on the child notebook results
-   - Records metrics based on the child notebook results
-   - Adds a span event to mark the completion of the child notebook
-   - Handles potential errors
-   - Ends the child notebook span
+   - Uses the `run_notebook_with_tracing` method to execute the child notebook with automatic tracing
+   - The method handles starting/ending spans, adding events, setting attributes, and recording metrics
+   - Demonstrates the simplified approach to notebook execution with tracing
+   ```python
+   child1_result = workflow_otel_helper.run_notebook_with_tracing(
+       notebook_path="./child_notebook_1",
+       span_name="Child_Notebook_1",
+       timeout_seconds=600,
+       etl_pipeline_id=workflow_id,
+       notebook_type="validation"
+   )
+   ```
 
 6. **Execute Child Notebook 2**  
-   - Similar to the execution of Child Notebook 1, but for a different task
-   - Demonstrates handling complex return values (like dictionaries)
+   - Also uses the `run_notebook_with_tracing` method for consistent instrumentation
+   - Demonstrates handling complex return values (like dictionaries) with additional attribute setting
+   - Shows how the method automatically parses JSON results and handles errors
 
 7. **Finalization**  
    - Calculates overall workflow metrics
@@ -174,27 +178,21 @@ Each span captures specific information relevant to its part of the workflow, pr
 
 ## Span Events
 
-The example demonstrates the use of span events to mark significant points in the workflow:
+The example demonstrates the use of span events to mark significant points in the workflow. With the refactored approach, many of these events are automatically added by the `run_notebook_with_tracing` method:
 
-1. **Child Notebook Execution Started**: Added when a child notebook execution begins
+1. **Notebook Execution Started**: Automatically added by `run_notebook_with_tracing` when a notebook execution begins
    ```python
-   workflow_otel_helper.add_span_event("Child_Notebook_1", "Child Notebook Execution Started", {
-       "notebook_path": "child_notebook_1",
-       "timestamp": time.time()
-   })
+   # This is now handled automatically by run_notebook_with_tracing
+   # The method adds an event with notebook_path and timestamp attributes
    ```
 
-2. **Child Notebook Execution Completed**: Added when a child notebook execution completes
+2. **Notebook Execution Completed**: Automatically added by `run_notebook_with_tracing` when a notebook execution completes
    ```python
-   workflow_otel_helper.add_span_event("Child_Notebook_1", "Child Notebook Execution Completed", {
-       "status": child1_result["status"],
-       "total_records": child1_result["total_records"],
-       "validation_errors": child1_result["validation_errors"],
-       "timestamp": time.time()
-   })
+   # This is now handled automatically by run_notebook_with_tracing
+   # The method adds an event with relevant result attributes and timestamp
    ```
 
-3. **Workflow Completed**: Added when the entire workflow completes
+3. **Workflow Completed**: Still manually added when the entire workflow completes
    ```python
    workflow_otel_helper.add_span_event("Notebook_Workflow", "Workflow Completed", {
        "workflow_success": str(workflow_success),
@@ -204,6 +202,8 @@ The example demonstrates the use of span events to mark significant points in th
        "timestamp": time.time()
    })
    ```
+
+The `run_notebook_with_tracing` method also automatically adds error events if notebook execution fails, with error details included in the event attributes.
 
 ## Benefits of This Approach
 
@@ -216,6 +216,8 @@ Using OpenTelemetry to instrument parent notebooks that call child notebooks pro
 5. **Standardized Return Values**: Encourages structured data return from child notebooks
 6. **Correlation**: All spans are correlated with the same workflow ID
 7. **Error Tracking**: Captures and correlates errors across the entire workflow
+8. **Reduced Boilerplate**: The helper methods (`run_notebook_with_tracing` and `instrument_function`) significantly reduce the amount of repetitive code needed
+9. **Consistent Instrumentation**: Ensures all notebook executions are instrumented in the same way
 
 ## Implementing in Your Own Workflows
 
@@ -223,9 +225,64 @@ To implement this approach in your own notebook workflows:
 
 1. **Create a parent notebook** with OpenTelemetry instrumentation
 2. **Ensure child notebooks return structured data** as JSON
-3. **Use try/finally blocks** to properly end spans even if errors occur
-4. **Capture return values** from child notebooks and use them as span attributes and metrics
+3. **Use the `run_notebook_with_tracing` method** to simplify notebook execution with tracing
+4. **Or use the `instrument_function` method** for more flexibility with custom functions
 5. **Add span events** to mark significant points in the workflow
+
+### Simplified Approach Using Helper Methods
+
+The OpenTelemetryHelper class provides two key methods that simplify the instrumentation of notebook executions:
+
+#### 1. run_notebook_with_tracing
+
+This method provides a specialized wrapper for `dbutils.notebook.run` that automatically handles all the tracing boilerplate:
+
+```python
+# Execute a child notebook with automatic tracing
+child1_result = workflow_otel_helper.run_notebook_with_tracing(
+    notebook_path="./child_notebook_1",
+    span_name="Child_Notebook_1",
+    timeout_seconds=600,
+    etl_pipeline_id=workflow_id,
+    notebook_type="validation"  # Additional attributes can be passed as kwargs
+)
+
+# The result is automatically parsed from JSON and returned as a dictionary
+print(f"Child Notebook 1 completed with status: {child1_result['status']}")
+```
+
+This method automatically:
+- Starts a span for the notebook execution
+- Adds span events for notebook start and completion
+- Executes the notebook using dbutils.notebook.run()
+- Parses the JSON result returned by the notebook
+- Sets span attributes based on the notebook results
+- Records metrics based on the notebook results (if defined in metrics registry)
+- Handles errors and adds appropriate error attributes
+- Ends the span when execution completes or fails
+
+#### 2. instrument_function
+
+This method provides a more generic wrapper for any function that needs tracing:
+
+```python
+# Create a traced version of dbutils.notebook.run
+run_traced_notebook = workflow_otel_helper.instrument_function(
+    dbutils.notebook.run,
+    span_name="Custom_Notebook_Execution"
+)
+
+# Use the wrapped function
+result_json = run_traced_notebook("./some_notebook", timeout_seconds=600)
+child2_result = json.loads(result_json)
+```
+
+This approach gives you more flexibility when you need to:
+- Wrap functions other than dbutils.notebook.run
+- Customize the tracing behavior
+- Process the results in a specific way
+
+Both methods significantly reduce the amount of boilerplate code needed for tracing, making your notebooks cleaner and easier to maintain.
 
 ## Alternative Approach: Instrumented Child Notebooks
 
