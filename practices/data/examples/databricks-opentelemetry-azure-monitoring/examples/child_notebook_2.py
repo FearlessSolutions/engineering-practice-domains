@@ -26,22 +26,12 @@ start_time = time.time()
 num_aggregations = random.randint(10, 50)
 print(f"Performing {num_aggregations} data aggregations...")
 
-# Simulate different aggregation types
-aggregation_types = ["sum", "average", "count", "min", "max"]
-aggregations_performed = {}
-
 for i in range(num_aggregations):
-    agg_type = random.choice(aggregation_types)
-    if agg_type in aggregations_performed:
-        aggregations_performed[agg_type] += 1
-    else:
-        aggregations_performed[agg_type] = 1
-    
     # Simulate processing delay for this aggregation
     agg_time = random.uniform(0.1, 0.5)
     time.sleep(agg_time)
     
-    print(f"Completed aggregation {i+1}/{num_aggregations}: {agg_type}")
+    print(f"Completed aggregation {i+1}/{num_aggregations}")
 
 # Simulate total processing time
 execution_time = random.uniform(3, 7)
@@ -59,7 +49,6 @@ status_code = 200 if random.random() < 0.9 else random.choice([400, 500])
 print(f"Aggregation complete with status code: {status_code}")
 print(f"Performed {num_aggregations} aggregations in {actual_execution_time:.2f} seconds")
 print(f"Simulated memory usage: {memory_usage:.2f} MB")
-print(f"Aggregation breakdown: {aggregations_performed}")
 
 # COMMAND ----------
 
@@ -74,9 +63,7 @@ result = {
     "status_code": status_code,
     "num_aggregations": num_aggregations,
     "execution_time_sec": round(actual_execution_time, 2),
-    "memory_usage_mb": round(memory_usage, 2),
-    "aggregations_performed": aggregations_performed,
-    "timestamp": time.time()
+    "memory_usage_mb": round(memory_usage, 2)
 }
 
 # Convert to JSON string to return to parent

@@ -93,7 +93,7 @@ workflow_otel_helper = OpenTelemetryHelper(
         },
         "Child_Notebook_2": {
             "execution_time_sec": "histogram",
-            "aggregations_performed": "counter",
+            "num_aggregations": "counter",  # Changed from aggregations_performed to num_aggregations
             "memory_usage_mb": "histogram"
         }
     },
@@ -110,156 +110,54 @@ print(f"    OpenTelemetryHelper instance created with workflow_id: {workflow_id}
 # MAGIC %md
 # MAGIC ## Execute Child Notebook 1: Data Validation
 # MAGIC 
-# MAGIC - Start a span for the child notebook execution
-# MAGIC - Execute the child notebook using dbutils.notebook.run()
-# MAGIC - Parse the return value from the child notebook
-# MAGIC - Add span attributes and metrics based on the child notebook results
+# MAGIC Using the `run_notebook_with_tracing` method to automatically handle:
+# MAGIC - Starting a span for the child notebook execution
+# MAGIC - Executing the child notebook using dbutils.notebook.run()
+# MAGIC - Parsing the return value from the child notebook
+# MAGIC - Adding span attributes and metrics based on the child notebook results
+# MAGIC - Adding span events for notebook start and completion
+# MAGIC - Error handling and span cleanup
 
 # COMMAND ----------
 
-# Start a span for Child Notebook 1 execution
-print("Starting Child_Notebook_1 span...")
-workflow_otel_helper.start_tracing("Child_Notebook_1", {
-    "etl_pipeline_id": workflow_id,
-    "notebook_path": "child_notebook_1"
-})
+# Execute Child Notebook 1 with automatic tracing
+print("Executing Child Notebook 1 with automatic tracing...")
+child1_result = workflow_otel_helper.run_notebook_with_tracing(
+    notebook_path="./child_notebook_1",
+    span_name="Child_Notebook_1",
+    timeout_seconds=600,
+    etl_pipeline_id=workflow_id,
+    notebook_type="validation"
+)
 
-# Add a span event to mark the start of the child notebook
-workflow_otel_helper.add_span_event("Child_Notebook_1", "Child Notebook Execution Started", {
-    "notebook_path": "child_notebook_1",
-    "timestamp": time.time()
-})
-
-try:
-    # Execute Child Notebook 1
-    print("Executing Child Notebook 1...")
-    child1_result_json = dbutils.notebook.run("./child_notebook_1", timeout_seconds=600)
-    
-    # Parse the JSON result
-    child1_result = json.loads(child1_result_json)
-    print(f"Child Notebook 1 completed with status: {child1_result['status']}")
-    
-    # Set span attributes based on child notebook results
-    for key, value in child1_result.items():
-        if isinstance(value, (str, int, float, bool)):
-            workflow_otel_helper.set_span_attribute("Child_Notebook_1", key, value)
-    
-    # Record metrics
-    workflow_otel_helper.record_metric("Child_Notebook_1", "execution_time_sec", child1_result["processing_time_sec"])
-    workflow_otel_helper.record_metric("Child_Notebook_1", "records_processed", child1_result["total_records"])
-    workflow_otel_helper.record_metric("Child_Notebook_1", "validation_errors", child1_result["validation_errors"])
-    
-    # Add a span event for the completion
-    workflow_otel_helper.add_span_event("Child_Notebook_1", "Child Notebook Execution Completed", {
-        "status": child1_result["status"],
-        "total_records": child1_result["total_records"],
-        "validation_errors": child1_result["validation_errors"],
-        "timestamp": time.time()
-    })
-    
-except Exception as e:
-    error_msg = str(e)
-    print(f"Error executing Child Notebook 1: {error_msg}")
-    
-    # Set error attributes
-    workflow_otel_helper.set_span_attribute("Child_Notebook_1", "error", "true")
-    workflow_otel_helper.set_span_attribute("Child_Notebook_1", "error_message", error_msg)
-    
-    # Add an error event
-    workflow_otel_helper.add_span_event("Child_Notebook_1", "Child Notebook Execution Failed", {
-        "error_message": error_msg,
-        "timestamp": time.time()
-    })
-    
-    # Raise the exception to stop execution
-    raise
-    
-finally:
-    # End the Child_Notebook_1 span
-    workflow_otel_helper.end_tracing("Child_Notebook_1")
-    print("Child_Notebook_1 span completed")
+print(f"Child Notebook 1 completed with status: {child1_result['status']}")
 
 # COMMAND ----------
 
 # MAGIC %md
 # MAGIC ## Execute Child Notebook 2: Data Aggregation
 # MAGIC 
-# MAGIC - Start a span for the child notebook execution
-# MAGIC - Execute the child notebook using dbutils.notebook.run()
-# MAGIC - Parse the return value from the child notebook
-# MAGIC - Add span attributes and metrics based on the child notebook results
+# MAGIC Using the `run_notebook_with_tracing` method to automatically handle:
+# MAGIC - Starting a span for the child notebook execution
+# MAGIC - Executing the child notebook using dbutils.notebook.run()
+# MAGIC - Parsing the return value from the child notebook
+# MAGIC - Adding span attributes and metrics based on the child notebook results
+# MAGIC - Adding span events for notebook start and completion
+# MAGIC - Error handling and span cleanup
 
 # COMMAND ----------
 
-# Start a span for Child Notebook 2 execution
-print("Starting Child_Notebook_2 span...")
-workflow_otel_helper.start_tracing("Child_Notebook_2", {
-    "etl_pipeline_id": workflow_id,
-    "notebook_path": "child_notebook_2"
-})
+# Execute Child Notebook 2 with automatic tracing
+print("Executing Child Notebook 2 with automatic tracing...")
+child2_result = workflow_otel_helper.run_notebook_with_tracing(
+    notebook_path="./child_notebook_2",
+    span_name="Child_Notebook_2",
+    timeout_seconds=600,
+    etl_pipeline_id=workflow_id,
+    notebook_type="aggregation"
+)
 
-# Add a span event to mark the start of the child notebook
-workflow_otel_helper.add_span_event("Child_Notebook_2", "Child Notebook Execution Started", {
-    "notebook_path": "child_notebook_2",
-    "timestamp": time.time()
-})
-
-try:
-    # Execute Child Notebook 2
-    print("Executing Child Notebook 2...")
-    child2_result_json = dbutils.notebook.run("./child_notebook_2", timeout_seconds=600)
-    
-    # Parse the JSON result
-    child2_result = json.loads(child2_result_json)
-    print(f"Child Notebook 2 completed with status code: {child2_result['status_code']}")
-    
-    # Set span attributes based on child notebook results
-    for key, value in child2_result.items():
-        if isinstance(value, (str, int, float, bool)):
-            workflow_otel_helper.set_span_attribute("Child_Notebook_2", key, value)
-    
-    # For complex objects like dictionaries, we can convert to string or extract specific values
-    if "aggregations_performed" in child2_result:
-        workflow_otel_helper.set_span_attribute(
-            "Child_Notebook_2", 
-            "aggregations_breakdown", 
-            json.dumps(child2_result["aggregations_performed"])
-        )
-    
-    # Record metrics
-    workflow_otel_helper.record_metric("Child_Notebook_2", "execution_time_sec", child2_result["execution_time_sec"])
-    workflow_otel_helper.record_metric("Child_Notebook_2", "aggregations_performed", child2_result["num_aggregations"])
-    workflow_otel_helper.record_metric("Child_Notebook_2", "memory_usage_mb", child2_result["memory_usage_mb"])
-    
-    # Add a span event for the completion
-    workflow_otel_helper.add_span_event("Child_Notebook_2", "Child Notebook Execution Completed", {
-        "status_code": child2_result["status_code"],
-        "num_aggregations": child2_result["num_aggregations"],
-        "execution_time_sec": child2_result["execution_time_sec"],
-        "timestamp": time.time()
-    })
-    
-except Exception as e:
-    error_msg = str(e)
-    print(f"Error executing Child Notebook 2: {error_msg}")
-    
-    # Set error attributes
-    workflow_otel_helper.set_span_attribute("Child_Notebook_2", "error", "true")
-    workflow_otel_helper.set_span_attribute("Child_Notebook_2", "error_message", error_msg)
-    
-    # Add an error event
-    workflow_otel_helper.add_span_event("Child_Notebook_2", "Child Notebook Execution Failed", {
-        "error_message": error_msg,
-        "timestamp": time.time()
-    })
-    
-    # Raise the exception to stop execution
-    raise
-    
-finally:
-    # End the Child_Notebook_2 span
-    workflow_otel_helper.end_tracing("Child_Notebook_2")
-    print("Child_Notebook_2 span completed")
+print(f"Child Notebook 2 completed with status code: {child2_result['status_code']}")
 
 # COMMAND ----------
 
@@ -321,5 +219,29 @@ print("Notebook_Workflow trace ended")
 # MAGIC 2. Child notebooks remain uninstrumented but return structured data
 # MAGIC 3. The parent notebook captures return values from child notebooks and uses them as span attributes and metrics
 # MAGIC 4. Span events are used to mark significant points in the workflow
+# MAGIC 5. The `run_notebook_with_tracing` method simplifies the instrumentation of notebook executions
 # MAGIC 
-# MAGIC This approach allows for comprehensive monitoring of notebook workflows without requiring OpenTelemetry instrumentation in every notebook.
+# MAGIC ### Using the OpenTelemetryHelper Methods
+# MAGIC 
+# MAGIC The OpenTelemetryHelper class provides two key methods for simplifying instrumentation:
+# MAGIC 
+# MAGIC 1. **run_notebook_with_tracing**: A specialized wrapper for `dbutils.notebook.run` that automatically handles:
+# MAGIC    - Starting and ending spans
+# MAGIC    - Adding span events for notebook start and completion
+# MAGIC    - Setting span attributes from notebook results
+# MAGIC    - Recording metrics based on notebook results
+# MAGIC    - Error handling and cleanup
+# MAGIC 
+# MAGIC 2. **instrument_function**: A generic wrapper for any function that needs tracing:
+# MAGIC    ```python
+# MAGIC    # Example: Wrap dbutils.notebook.run with tracing
+# MAGIC    run_traced_notebook = workflow_otel_helper.instrument_function(
+# MAGIC        dbutils.notebook.run,
+# MAGIC        span_name="Custom_Notebook_Execution"
+# MAGIC    )
+# MAGIC    
+# MAGIC    # Use the wrapped function
+# MAGIC    result_json = run_traced_notebook("./some_notebook", timeout_seconds=600)
+# MAGIC    ```
+# MAGIC 
+# MAGIC This approach allows for comprehensive monitoring of notebook workflows without requiring OpenTelemetry instrumentation in every notebook, while minimizing the amount of boilerplate code needed.
